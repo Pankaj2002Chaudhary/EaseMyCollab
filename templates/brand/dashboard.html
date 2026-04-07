@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c9a96e;
+    --accent2: #e8c99a;
+    --text: #f0ece4;
+    --muted: #6b6870;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+
+  .dashboard-wrap {
+    padding: 48px 32px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  .dash-title {
+    font-size: 28px;
+    font-family: 'Playfair Display';
+    margin: 0;
+  }
+
+  .btn-create {
+    padding: 12px 20px;
+    background: var(--accent);
+    border-radius: 10px;
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+    transition: 0.3s;
+  }
+
+  .btn-create:hover { background: var(--accent2); }
+
+  .campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .campaign-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .campaign-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+
+  .campaign-title { font-size: 18px; margin-bottom: 8px; font-weight: 600; }
+  .campaign-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  
+  .loading-text { color: var(--accent); font-style: italic; }
+</style>
+
+<div class="dashboard-wrap">
+  <div class="dash-header">
+    <h1 class="dash-title">Campaign Dashboard</h1>
+    <a href="/create-campaign/" class="btn-create">+ Create Campaign</a>
+  </div>
+
+  <div class="campaign-grid" id="campaign-container">
+    <p class="loading-text">Loading your campaigns...</p>
+  </div>
+</div>
+
+<script>
+// Global variables
+let openedCampaign = null;
+const token = localStorage.getItem("token");
+
+// 1. UPDATE STATUS FUNCTION (Bahar rakha hai taaki HTML buttons ise dhoond sakein)
+async function updateStatus(appId, newStatus, event) {
+    if (event) event.stopPropagation();
+    if (!token) return;
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/application/${appId}/update/`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token 
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (res.ok) {
+            alert("Status Updated: " + newStatus);
+            location.reload(); 
+        } else {
+            const data = await res.json();
+            alert("Error: " + (data.error || "Failed to update"));
+        }
+    } catch (err) {
+        alert("Server connection failed.");
+    }
+}
+
+// 2. TOGGLE APPLICANTS FUNCTION
+async function toggleApplicants(campaignId) {
+    const section = document.getElementById(`applicants-${campaignId}`);
+    if (openedCampaign === campaignId) {
+        section.innerHTML = "";
+        openedCampaign = null;
+        return;
+    }
+
+    openedCampaign = campaignId;
+    section.innerHTML = "<p class='loading-text'>Loading applicants...</p>";
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/applicants/${campaignId}/`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const apps = await res.json();
+
+        if (apps.length === 0) {
+            section.innerHTML = "<p style='font-size:12px; color:var(--muted)'>No applicants yet</p>";
+            return;
+        }
+
+        section.innerHTML = "";
+        apps.forEach(app => {
+            const div = document.createElement("div");
+            div.style.padding = "10px";
+            div.style.borderBottom = "1px solid #333";
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--accent); cursor:pointer;" onclick="event.stopPropagation(); window.location.href='/profile/?user_id=${app.influencer_user_id}'">
+                        👤 ${app.influencer_name || 'Undefined'}
+                    </span>
+                    <div>
+                        ${app.status === 'pending' ? `
+                            <button onclick="updateStatus(${app.id}, 'accepted', event)" style="background:#4ade80; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px; color:black; font-weight:bold;">Accept</button>
+                            <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#f87171; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; color:white;">Reject</button>
+                        ` : `<span style="font-size:12px; color:gray;">${app.status.toUpperCase()}</span>`}
+                    </div>
+                </div>
+            `;
+            section.appendChild(div);
+        });
+    } catch (err) {
+        section.innerHTML = "Error loading list.";
+    }
+}
+
+// 3. PAGE LOAD LOGIC
+document.addEventListener("DOMContentLoaded", function() {
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    const container = document.getElementById("campaign-container");
+
+    async function loadCampaigns() {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/my-campaigns/", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "/login/";
+                return;
+            }
+
+            const data = await response.json();
+            container.innerHTML = "";
+
+            if (!data || data.length === 0) {
+                container.innerHTML = "<p>No campaigns yet</p>";
+                return;
+            }
+
+            data.sort((a, b) => b.id - a.id);
+            data.forEach(c => {
+                const card = document.createElement("div");
+                card.className = "campaign-card";
+                card.innerHTML = `
+                    <div class="campaign-title">${c.title}</div>
+                    <div class="campaign-desc">${c.description || "No description provided."}</div>
+                    <div id="applicants-${c.id}" class="applicants-list" style="margin-top:10px;"></div>
+                `;
+                card.onclick = () => toggleApplicants(c.id);
+                container.appendChild(card);
+            });
+        } catch (error) {
+            container.innerHTML = "<p style='color:red;'>Failed to load campaigns.</p>";
+        }
+    }
+    loadCampaigns();
+});
+</script>
+{% endblock %}

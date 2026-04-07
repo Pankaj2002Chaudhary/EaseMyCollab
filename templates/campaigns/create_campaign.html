@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0d0d0f;
+  --surface: #141417;
+  --surface2: #1c1c21;
+  --border: rgba(255,255,255,0.07);
+  --accent: #c9a96e;
+  --accent2: #e8c99a;
+  --text: #f0ece4;
+  --muted: #6b6870;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+}
+
+/* Wrapper */
+.campaign-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* Card */
+.campaign-card {
+  width: 100%;
+  max-width: 500px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* Title */
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Inputs */
+.field {
+  margin-bottom: 15px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+
+.field textarea {
+  resize: none;
+  height: 100px;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(201,169,110,0.2);
+}
+
+/* Button */
+.btn-create {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), #a8812e);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #0d0d0f;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+}
+
+</style>
+
+<div class="campaign-wrap">
+  <div class="campaign-card">
+
+    <div class="card-title">🚀 Create Campaign</div>
+
+    <div class="field">
+      <input id="title" placeholder="Campaign Title">
+    </div>
+
+    <div class="field">
+      <textarea id="description" placeholder="Campaign Description"></textarea>
+    </div>
+
+    <div class="field">
+      <input id="budget" placeholder="Budget Range (e.g. ₹10k - ₹50k)">
+    </div>
+
+    <div class="field">
+      <input id="deadline" type="date">
+    </div>
+
+    <button class="btn-create" onclick="createCampaign()">
+      Create Campaign ✦
+    </button>
+
+  </div>
+</div>
+
+<script>
+function createCampaign() {
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Login required");
+        window.location.href = "/login/";
+        return;
+    }
+
+    fetch("/api/create-campaign/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            title: title.value,
+            description: description.value,
+            budget_range: budget.value,
+            deadline: deadline.value,
+            status: "open"
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message) {
+            alert("Campaign created ");
+            window.location.href = "/dashboard/";
+        } else {
+            alert(JSON.stringify(data));
+        }
+    });
+}
+</script>
+
+{% endblock %}

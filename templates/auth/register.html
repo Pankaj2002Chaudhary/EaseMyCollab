@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1c1c21;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c9a96e;
+    --accent2: #e8c99a;
+    --text: #f0ece4;
+    --muted: #6b6870;
+    --error: #f87171;
+    --success: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .register-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,169,110,0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 90% 90%, rgba(201,169,110,0.04) 0%, transparent 50%),
+      var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .register-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,169,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,169,110,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+
+  .register-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 44px;
+    box-shadow:
+      0 0 0 1px rgba(201,169,110,0.08),
+      0 32px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .register-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  /* Header */
+  .card-header-block {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), #8b6914);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0d0d0f;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(201,169,110,0.25);
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Role selector — custom pill toggle */
+  .role-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .role-option { position: relative; }
+
+  .role-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+
+  .role-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: center;
+    user-select: none;
+  }
+
+  .role-label .role-icon { font-size: 20px; }
+  .role-label .role-desc { font-size: 10px; letter-spacing: 0.3px; color: var(--muted); font-weight: 400; }
+
+  .role-option input:checked + .role-label {
+    background: rgba(201,169,110,0.1);
+    border-color: rgba(201,169,110,0.35);
+    color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.08);
+  }
+
+  .role-option input:checked + .role-label .role-desc { color: rgba(232,201,154,0.6); }
+
+  .role-label:hover {
+    border-color: rgba(201,169,110,0.2);
+    color: var(--text);
+  }
+
+  /* Fields */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding-left: 2px;
+  }
+
+  .field-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    transition: all 0.25s ease;
+    -webkit-appearance: none;
+  }
+
+  .field-input::placeholder { color: var(--muted); font-size: 13px; }
+
+  .field-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+  }
+
+  .field-input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(248,113,113,0.1);
+  }
+
+  /* Password wrapper */
+  .pw-wrap { position: relative; }
+  .pw-wrap .field-input { padding-right: 44px; }
+
+  .toggle-pw {
+    position: absolute;
+    right: 13px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 15px;
+    padding: 4px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .toggle-pw:hover { color: var(--text); }
+
+  /* Password strength bar */
+  .strength-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--surface2);
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .strength-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s ease;
+    width: 0%;
+  }
+
+  .strength-text {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    padding-left: 2px;
+    height: 14px;
+  }
+
+  .error-msg {
+    font-size: 11px;
+    color: var(--error);
+    padding-left: 2px;
+    min-height: 14px;
+    display: none;
+    margin-top: 2px;
+  }
+
+  .error-msg.show { display: block; }
+
+  /* Global error */
+  .global-err {
+    font-size: 12px;
+    color: var(--error);
+    text-align: center;
+    padding: 10px 14px;
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.15);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* Submit btn */
+  .btn-register {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #a8812e);
+    color: #0d0d0f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(201,169,110,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-register:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(201,169,110,0.35);
+  }
+
+  .btn-register:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+  .btn-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(13,13,15,0.3);
+    border-top-color: #0d0d0f;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .btn-register.loading .btn-spinner { display: block; }
+  .btn-register.loading .btn-text    { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .login-link a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .login-link a:hover { color: var(--accent); }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+  }
+
+  .shake { animation: shake 0.4s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="register-wrap">
+  <div class="register-card" id="registerCard">
+
+    <div class="card-header-block">
+      <div class="logo-mark">E</div>
+      <div class="card-title">Create account</div>
+      <div class="card-sub">Join EaseMyCollab today</div>
+    </div>
+
+    <!-- Role toggle -->
+    <div class="role-toggle">
+      <div class="role-option">
+        <input type="radio" name="role" id="roleInfluencer" value="influencer" checked>
+        <label class="role-label" for="roleInfluencer">
+          <span class="role-icon">🎯</span>
+          Influencer
+          <span class="role-desc">Apply to campaigns</span>
+        </label>
+      </div>
+      <div class="role-option">
+        <input type="radio" name="role" id="roleBrand" value="brand">
+        <label class="role-label" for="roleBrand">
+          <span class="role-icon">🏢</span>
+          Brand
+          <span class="role-desc">Post campaigns</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Global error -->
+    <div class="global-err" id="globalErr"></div>
+
+    <!-- Username -->
+    <div class="field-group">
+      <label class="field-label">Username</label>
+      <input type="text" id="username" class="field-input" placeholder="Choose a username" autocomplete="username">
+      <div class="error-msg" id="usernameErr">Username is required</div>
+    </div>
+
+    <!-- Email -->
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <input type="email" id="email" class="field-input" placeholder="your@email.com" autocomplete="email">
+      <div class="error-msg" id="emailErr">Enter a valid email address</div>
+    </div>
+
+    <!-- Password -->
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="password" class="field-input" placeholder="Create a password" autocomplete="new-password">
+        <button class="toggle-pw" type="button" onclick="togglePw()" id="toggleBtn">👁</button>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      <div class="strength-text" id="strengthText"></div>
+      <div class="error-msg" id="passwordErr">Password must be at least 6 characters</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-register" id="registerBtn" onclick="register()">
+      <div class="btn-spinner"></div>
+      <span class="btn-text">Create Account ✦</span>
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a href="/login/">Sign in</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Password visibility ──
+  function togglePw() {
+    const pw  = document.getElementById("password");
+    const btn = document.getElementById("toggleBtn");
+    pw.type = pw.type === "password" ? "text" : "password";
+    btn.textContent = pw.type === "password" ? "👁" : "🙈";
+  }
+
+  // ── Password strength ──
+  document.getElementById("password").addEventListener("input", function () {
+    const val  = this.value;
+    const fill = document.getElementById("strengthFill");
+    const text = document.getElementById("strengthText");
+
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^a-zA-Z0-9]/.test(val)) score++;
+
+    const levels = [
+      { pct: "0%",   color: "transparent",          label: "" },
+      { pct: "25%",  color: "#f87171",               label: "Weak" },
+      { pct: "50%",  color: "#fbbf24",               label: "Fair" },
+      { pct: "75%",  color: "#a3e635",               label: "Good" },
+      { pct: "100%", color: "var(--success)",        label: "Strong" },
+    ];
+
+    const lvl = val.length === 0 ? levels[0] : levels[Math.min(score, 4)];
+    fill.style.width      = lvl.pct;
+    fill.style.background = lvl.color;
+    text.textContent      = lvl.label;
+    text.style.color      = lvl.color;
+  });
+
+  // ── Clear errors on input ──
+  ["username", "email", "password"].forEach(id => {
+    document.getElementById(id).addEventListener("input", () => {
+      document.getElementById(id).classList.remove("error");
+      document.getElementById(id + "Err").classList.remove("show");
+      document.getElementById("globalErr").style.display = "none";
+    });
+  });
+
+  // ── Enter to submit ──
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") register();
+  });
+
+  // ── Validate ──
+  function validate() {
+    let ok = true;
+
+    const username = document.getElementById("username").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username) {
+      document.getElementById("username").classList.add("error");
+      document.getElementById("usernameErr").classList.add("show");
+      ok = false;
+    }
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!email || !emailOk) {
+      document.getElementById("email").classList.add("error");
+      document.getElementById("emailErr").classList.add("show");
+      ok = false;
+    }
+
+    if (!password || password.length < 6) {
+      document.getElementById("password").classList.add("error");
+      document.getElementById("passwordErr").classList.add("show");
+      ok = false;
+    }
+
+    return ok;
+  }
+
+  // ── Register ──
+  function register() {
+    if (!validate()) {
+      document.getElementById("registerCard").classList.add("shake");
+      setTimeout(() => document.getElementById("registerCard").classList.remove("shake"), 400);
+      return;
+    }
+
+    const btn       = document.getElementById("registerBtn");
+    const globalErr = document.getElementById("globalErr");
+    const role      = document.querySelector('input[name="role"]:checked').value;
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+    globalErr.style.display = "none";
+
+    fetch("http://127.0.0.1:8000/api/register/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("username").value.trim(),
+        email:    document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value,
+        role:     role
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      // If API returns an error field
+      if (data.error || data.detail || data.username || data.email) {
+        const msg = data.error || data.detail
+          || (data.username && data.username[0])
+          || (data.email && data.email[0])
+          || "Registration failed. Please try again.";
+
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        globalErr.textContent    = msg;
+        globalErr.style.display  = "block";
+        document.getElementById("registerCard").classList.add("shake");
+        setTimeout(() => document.getElementById("registerCard").classList.remove("shake"), 400);
+        return;
+      }
+
+      // Success
+      btn.classList.remove("loading");
+      btn.style.background = "rgba(74,222,128,0.15)";
+      btn.style.color      = "var(--success)";
+      btn.style.border     = "1px solid rgba(74,222,128,0.25)";
+      btn.querySelector(".btn-text").style.display = "flex";
+      btn.querySelector(".btn-text").textContent   = "✓ Account created!";
+
+      setTimeout(() => window.location.href = "/login/", 900);
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.classList.remove("loading");
+      globalErr.textContent   = "Could not connect to server. Try again.";
+      globalErr.style.display = "block";
+    });
+  }
+</script>
+
+{% endblock %}

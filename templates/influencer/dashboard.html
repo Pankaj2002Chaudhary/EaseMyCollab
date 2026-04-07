@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .dash-container { padding: 80px 20px; max-width: 1000px; margin: 0 auto; }
+    .status-badge { 
+        padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase;
+    }
+    .status-pending { background: rgba(201,169,110,0.1); color: var(--accent); }
+    .status-accepted { background: rgba(74,222,128,0.1); color: #4ade80; }
+    
+    .brand-link { color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500; }
+    .brand-link:hover { text-decoration: underline; }
+</style>
+
+<div class="dash-container">
+    <h1 style="font-family:'Playfair Display'; color:var(--text); margin-bottom:10px;">My Applications</h1>
+    <p style="color:var(--muted); margin-bottom:40px;">Track your collaboration requests with brands</p>
+
+    <div id="app-list">
+        </div>
+</div>
+
+<script>
+    function loadApps() {
+        const token = localStorage.getItem("token");
+        fetch("/api/influencer/my-applications/", {
+            headers: { "Authorization": "Bearer " + token }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("app-list");
+            if(data.length === 0) {
+                container.innerHTML = `<p style="color:var(--muted)">No applications yet. <a href="/" style="color:var(--accent)">Explore Campaigns</a></p>`;
+                return;
+            }
+            container.innerHTML = data.map(app => `
+                <div style="background:var(--surface); border:1px solid var(--border); padding:20px; border-radius:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h3 style="color:var(--text); margin-bottom:5px;">${app.campaign_title}</h3>
+                        <p style="font-size:13px; color:var(--muted)">Brand: <span class="brand-link" onclick="window.location.href='/profile/?user_id=${app.brand_user_id}'">${app.brand_name}</span></p>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="status-badge status-${app.status.toLowerCase()}">${app.status}</span>
+                        <p style="font-size:11px; color:var(--muted); margin-top:8px;">Applied on: ${app.applied_at}</p>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+    loadApps();
+</script>
+{% endblock %}

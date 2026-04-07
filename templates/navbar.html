@@ -1,0 +1,306 @@
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  .site-nav {
+    background: rgba(13,13,15,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .site-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 40%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4), transparent);
+    pointer-events: none;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  /* Brand */
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: #f0ece4;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+
+  .nav-brand span { color: #c9a96e; }
+  .nav-brand:hover { opacity: 0.85; text-decoration: none; color: #f0ece4; }
+
+  /* Nav links */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    font-weight: 400;
+    color: #6b6870;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    color: #f0ece4;
+    background: rgba(255,255,255,0.05);
+    text-decoration: none;
+  }
+
+  .nav-link.active {
+    color: #e8c99a;
+    background: rgba(201,169,110,0.1);
+  }
+
+  /* Right side */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .nav-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px 7px 8px;
+    background: rgba(201,169,110,0.08);
+    border: 1px solid rgba(201,169,110,0.18);
+    border-radius: 50px;
+    color: #e8c99a;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-profile-btn:hover {
+    background: rgba(201,169,110,0.15);
+    border-color: rgba(201,169,110,0.35);
+    color: #e8c99a;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  .nav-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a96e, #8b6914);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0d0d0f;
+    flex-shrink: 0;
+  }
+
+  .nav-logout-btn {
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #6b6870;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease;
+  }
+
+  .nav-logout-btn:hover {
+    background: rgba(248,113,113,0.08);
+    border-color: rgba(248,113,113,0.2);
+    color: #f87171;
+  }
+
+  /* Mobile hamburger */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px;
+    border: none;
+    background: none;
+  }
+
+  .nav-hamburger span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: #6b6870;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+  }
+
+  .nav-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); background: #c9a96e; }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); background: #c9a96e; }
+
+  /* Mobile menu */
+  .nav-mobile {
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 0; right: 0;
+    background: rgba(13,13,15,0.97);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 12px 24px 20px;
+    flex-direction: column;
+    gap: 4px;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-mobile.open { display: flex; }
+
+  .nav-mobile .nav-link {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .nav-mobile-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    margin: 8px 0;
+  }
+
+  @media (max-width: 680px) {
+    .site-nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .nav-profile-btn span.label { display: none; }
+    .nav-hamburger { display: flex; }
+  }
+</style>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="/">Ease<span>My</span>Collab</a>
+
+    <div class="nav-links" id="navLinks">
+      </div>
+
+    <div class="nav-right" id="navAuthSection">
+      </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMobile()" style="display: none;">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="nav-mobile" id="mobileMenu">
+    </div>
+</nav>
+
+<script>
+  function updateNavbar() {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role"); // 'brand' or 'influencer'
+    const name = localStorage.getItem("name") || "User";
+
+    const navLinks = document.getElementById("navLinks");
+    const navAuthSection = document.getElementById("navAuthSection");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const hamburger = document.getElementById("hamburger");
+
+    // 1. Clear existing content
+    navLinks.innerHTML = "";
+    navAuthSection.innerHTML = "";
+    mobileMenu.innerHTML = "";
+
+    if (token) {
+      // --- USER IS LOGGED IN ---
+      hamburger.style.display = "flex";
+      
+      let dashboardUrl = (role === 'brand') ? '/dashboard/' : '/influencer/dashboard/';
+      let dashboardLabel = "Dashboard";
+      
+      // Desktop Links
+      let linksHTML = `<a href="${dashboardUrl}" class="nav-link">Dashboard</a>`;
+      if (role === 'brand') {
+        linksHTML += `<a href="/create-campaign/" class="nav-link">Create Campaign</a>`;
+      }
+      navLinks.innerHTML = linksHTML;
+
+      // Desktop Auth Section (Profile + Logout)
+      navAuthSection.innerHTML = `
+        <a href="/profile/" class="nav-profile-btn">
+          <div class="nav-avatar">${name.charAt(0).toUpperCase()}</div>
+          <span class="label">${name.split(" ")[0]}</span>
+        </a>
+        <button class="nav-logout-btn" onclick="handleLogout()">Logout</button>
+      `;
+
+      // Mobile Menu Links
+      mobileMenu.innerHTML = `
+        <a href="${dashboardUrl}" class="nav-link">Dashboard</a>
+        ${role === 'brand' ? '<a href="/create-campaign/" class="nav-link">Create Campaign</a>' : ''}
+        <div class="nav-mobile-divider"></div>
+        <a href="/profile/" class="nav-link">Profile</a>
+        <a href="#" class="nav-link" style="color:#f87171" onclick="handleLogout()">Logout</a>
+      `;
+
+    } else {
+      // --- USER IS LOGGED OUT ---
+      hamburger.style.display = "none";
+      
+      // Desktop Auth Section (Login/Register)
+      navAuthSection.innerHTML = `
+        <a href="/login/" class="nav-link">Login</a>
+        <a href="/register/" class="btn-primary-gold" style="padding: 8px 20px; font-size: 13px; text-decoration:none;">Join Now</a>
+      `;
+    }
+
+    // Highlight Active Link
+    const currentPath = window.location.pathname;
+    document.querySelectorAll(".nav-link").forEach(a => {
+      if (a.getAttribute("href") === currentPath) {
+        a.classList.add("active");
+      }
+    });
+  }
+
+  // Run on load
+  updateNavbar();
+
+  function toggleMobile() {
+    document.getElementById("mobileMenu").classList.toggle("open");
+    document.getElementById("hamburger").classList.toggle("open");
+  }
+
+  function handleLogout() {
+    localStorage.clear(); // Sab kuch saaf
+    window.location.href = "/login/";
+  }
+</script>

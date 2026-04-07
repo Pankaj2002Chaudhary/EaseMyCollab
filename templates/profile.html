@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1c1c21;
+    --border: rgba(255,255,255,0.08);
+    --accent: #c9a96e;
+    --accent-bright: #e8c99a;
+    --text: #f0ece4;
+    --muted: #8e8c94;
+  }
+
+  /* Main Wrapper */
+  .profile-container {
+    padding: 60px 20px;
+    background: var(--bg);
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .profile-card {
+    width: 100%;
+    max-width: 650px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  /* Header Section */
+  .profile-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .avatar-circle {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--accent), #8b6914);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #000;
+    margin: 0 auto 15px;
+    font-weight: bold;
+  }
+
+  .profile-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+
+  .profile-subtitle {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* Form Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .full-width { grid-column: 1 / span 2; }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .input-group label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .form-control {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+    width: 100% !important; /* Forces width */
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.1);
+  }
+
+  .form-control:disabled {
+    background: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    color: var(--text);
+    opacity: 1;
+    cursor: default;
+  }
+
+  textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  /* Buttons */
+  .action-area {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+  }
+
+  .btn {
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+  }
+
+  .btn-edit {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .btn-edit:hover {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .btn-save {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .btn-save:hover { background: var(--accent-bright); }
+
+  .btn-cancel {
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+  }
+
+  /* Toast notification fixes */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 1000;
+    display: none;
+  }
+  .toast.show { display: block; animation: slideIn 0.3s forwards; }
+  .toast-success { background: #1b4332; color: #74c69d; border: 1px solid #2d6a4f; }
+  .toast-error { background: #431b1b; color: #c67474; border: 1px solid #6a2d2d; }
+
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: auto; }
+  }
+</style>
+
+<div class="profile-container">
+  <div class="profile-card">
+    
+    <div class="profile-header">
+      <div class="avatar-circle" id="avatarIcon">✦</div>
+      <h1 class="profile-title" id="headerName">Profile Settings</h1>
+      <p class="profile-subtitle" id="profileSubtitle">View and update your professional details</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="input-group full-width">
+        <label>Full Name</label>
+        <input type="text" id="name" class="form-control" placeholder="Not set" disabled>
+      </div>
+
+      <div class="input-group">
+        <label>Industry / Niche</label>
+        <input type="text" id="industry" class="form-control" placeholder="e.g. Fashion" disabled>
+      </div>
+
+      <div class="input-group">
+        <label>Website</label>
+        <input type="text" id="website" class="form-control" placeholder="yoursite.com" disabled>
+      </div>
+
+      <div class="input-group full-width">
+        <label>Short Bio</label>
+        <textarea id="bio" class="form-control" placeholder="Write something about yourself..." disabled></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Instagram</label>
+        <input type="text" id="instagram" class="form-control" placeholder="@username" disabled>
+      </div>
+
+      <div class="input-group">
+        <label>YouTube</label>
+        <input type="text" id="youtube" class="form-control" placeholder="Channel Link" disabled>
+      </div>
+    </div>
+
+    <div class="action-area" id="btnRow">
+      </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const token = localStorage.getItem("token");
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetUserId = urlParams.get('user_id');
+
+  function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = `toast toast-${type} show`;
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
+  function fillFields(data) {
+    document.getElementById("name").value = data.name || "";
+    document.getElementById("industry").value = data.industry || "";
+    document.getElementById("website").value = data.website || "";
+    document.getElementById("bio").value = data.bio || "";
+    document.getElementById("instagram").value = data.instagram || "";
+    document.getElementById("youtube").value = data.youtube || "";
+
+    if (data.name) {
+      document.getElementById("headerName").textContent = data.name;
+      document.getElementById("avatarIcon").textContent = data.name.charAt(0).toUpperCase();
+    }
+
+    const btnRow = document.getElementById("btnRow");
+    if (data.is_owner) {
+      btnRow.innerHTML = `<button class="btn btn-edit" onclick="enableEdit()">Edit Profile</button>`;
+    } else {
+      btnRow.innerHTML = ``; 
+      document.getElementById("profileSubtitle").textContent = "Public Profile View";
+    }
+  }
+
+  function loadProfile() {
+    let apiUrl = "http://127.0.0.1:8000/api/profile/";
+    if (targetUserId) apiUrl += `?user_id=${targetUserId}`;
+
+    fetch(apiUrl, {
+      headers: { "Authorization": "Bearer " + token }
+    })
+    .then(res => res.json())
+    .then(data => fillFields(data))
+    .catch(err => showToast("Error loading profile", "error"));
+  }
+
+  loadProfile();
+
+  function enableEdit() {
+    document.querySelectorAll(".form-control").forEach(el => el.disabled = false);
+    document.getElementById("btnRow").innerHTML = `
+      <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
+      <button class="btn btn-save" onclick="saveProfile()">Save Changes</button>
+    `;
+  }
+
+  function cancelEdit() {
+    document.querySelectorAll(".form-control").forEach(el => el.disabled = true);
+    loadProfile();
+  }
+
+  function saveProfile() {
+    const payload = {
+      name: document.getElementById("name").value,
+      industry: document.getElementById("industry").value,
+      website: document.getElementById("website").value,
+      bio: document.getElementById("bio").value,
+      instagram: document.getElementById("instagram").value,
+      youtube: document.getElementById("youtube").value,
+    };
+
+    fetch("http://127.0.0.1:8000/api/profile/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(() => {
+      showToast("Profile Updated!");
+      cancelEdit();
+    })
+    .catch(() => showToast("Update Failed", "error"));
+  }
+</script>
+{% endblock %}

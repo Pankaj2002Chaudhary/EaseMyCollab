@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1c1c21;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c9a96e;
+    --accent2: #e8c99a;
+    --text: #f0ece4;
+    --muted: #6b6870;
+    --error: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,169,110,0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 10% 90%, rgba(201,169,110,0.04) 0%, transparent 50%),
+      var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* subtle grid */
+  .login-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,169,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,169,110,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 44px;
+    box-shadow:
+      0 0 0 1px rgba(201,169,110,0.08),
+      0 32px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), #8b6914);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0d0d0f;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(201,169,110,0.25);
+  }
+
+  .login-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+
+  .login-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding-left: 2px;
+  }
+
+  .field-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    transition: all 0.25s ease;
+    -webkit-appearance: none;
+  }
+
+  .field-input::placeholder { color: var(--muted); font-size: 13px; }
+
+  .field-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+  }
+
+  .field-input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(248,113,113,0.1);
+  }
+
+  /* Password wrapper */
+  .password-wrap {
+    position: relative;
+  }
+
+  .password-wrap .field-input {
+    padding-right: 44px;
+  }
+
+  .toggle-pw {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 15px;
+    padding: 4px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .toggle-pw:hover { color: var(--text); }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 2px;
+    padding-left: 2px;
+    min-height: 16px;
+    display: none;
+  }
+
+  .error-msg.show { display: block; }
+
+  .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+  .btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #a8812e);
+    color: #0d0d0f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(201,169,110,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-login:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(201,169,110,0.35);
+  }
+
+  .btn-login:active { transform: translateY(0); }
+
+  .btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Spinner inside button */
+  .btn-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(13,13,15,0.3);
+    border-top-color: #0d0d0f;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .btn-login.loading .btn-spinner { display: block; }
+  .btn-login.loading .btn-text    { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .register-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .register-link a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .register-link a:hover { color: var(--accent); }
+
+  /* Shake animation on error */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+  }
+
+  .shake { animation: shake 0.4s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="login-wrap">
+  <div class="login-card" id="loginCard">
+
+    <div class="login-logo">
+      <div class="logo-mark">E</div>
+      <div class="login-title">Welcome back</div>
+      <div class="login-sub">Sign in to EaseMyCollab</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Username</label>
+      <input type="text" id="username" class="field-input" placeholder="Enter your username" autocomplete="username">
+      <div class="error-msg" id="usernameErr">Please enter your username</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <div class="password-wrap">
+        <input type="password" id="password" class="field-input" placeholder="Enter your password" autocomplete="current-password">
+        <button class="toggle-pw" type="button" onclick="togglePassword()" id="toggleBtn" title="Show password">👁</button>
+      </div>
+      <div class="error-msg" id="passwordErr">Please enter your password</div>
+    </div>
+
+    <div class="error-msg show" id="globalErr" style="display:none; text-align:center; margin-bottom:4px; font-size:13px;"></div>
+
+    <div class="divider"></div>
+
+    <button class="btn-login" id="loginBtn" onclick="login()">
+      <div class="btn-spinner"></div>
+      <span class="btn-text">Sign In ✦</span>
+    </button>
+
+    <div class="register-link">
+      Don't have an account? <a href="/register/">Create one</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Toggle password visibility ──
+  function togglePassword() {
+    const pw  = document.getElementById("password");
+    const btn = document.getElementById("toggleBtn");
+    if (pw.type === "password") {
+      pw.type = "text";
+      btn.textContent = "🙈";
+    } else {
+      pw.type = "password";
+      btn.textContent = "👁";
+    }
+  }
+
+  // ── Clear errors on input ──
+  document.getElementById("username").addEventListener("input", () => {
+    document.getElementById("username").classList.remove("error");
+    document.getElementById("usernameErr").classList.remove("show");
+    document.getElementById("globalErr").style.display = "none";
+  });
+
+  document.getElementById("password").addEventListener("input", () => {
+    document.getElementById("password").classList.remove("error");
+    document.getElementById("passwordErr").classList.remove("show");
+    document.getElementById("globalErr").style.display = "none";
+  });
+
+  // ── Submit on Enter ──
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") login();
+  });
+
+  // ── Login ──
+  function login() {
+    const usernameEl = document.getElementById("username");
+    const passwordEl = document.getElementById("password");
+    const btn        = document.getElementById("loginBtn");
+    const globalErr  = document.getElementById("globalErr");
+
+    let valid = true;
+
+    // Validate
+    if (!usernameEl.value.trim()) {
+      usernameEl.classList.add("error");
+      document.getElementById("usernameErr").classList.add("show");
+      valid = false;
+    }
+
+    if (!passwordEl.value.trim()) {
+      passwordEl.classList.add("error");
+      document.getElementById("passwordErr").classList.add("show");
+      valid = false;
+    }
+
+    if (!valid) {
+      document.getElementById("loginCard").classList.add("shake");
+      setTimeout(() => document.getElementById("loginCard").classList.remove("shake"), 400);
+      return;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    btn.classList.add("loading");
+    globalErr.style.display = "none";
+
+    fetch("http://127.0.0.1:8000/api/login/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: usernameEl.value.trim(),
+        password: passwordEl.value
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.access) {
+        localStorage.setItem("token", data.access);
+        localStorage.setItem("role",  data.user.role);
+        if (data.user.name) localStorage.setItem("name", data.user.name);
+
+        // Brief success pause before redirect
+        btn.textContent = "✓ Success";
+        btn.style.background = "rgba(74,222,128,0.15)";
+        btn.style.color = "#4ade80";
+        btn.style.border = "1px solid rgba(74,222,128,0.25)";
+
+        setTimeout(() => {
+          window.location.href = data.user.role === "brand" ? "/dashboard/" : "/";
+        }, 600);
+
+      } else {
+        // Error state
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        usernameEl.classList.add("error");
+        passwordEl.classList.add("error");
+        globalErr.textContent = data.detail || "Invalid username or password";
+        globalErr.style.display = "block";
+        document.getElementById("loginCard").classList.add("shake");
+        setTimeout(() => document.getElementById("loginCard").classList.remove("shake"), 400);
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.classList.remove("loading");
+      globalErr.textContent = "Could not connect to server. Try again.";
+      globalErr.style.display = "block";
+    });
+  }
+</script>
+
+{% endblock %}
