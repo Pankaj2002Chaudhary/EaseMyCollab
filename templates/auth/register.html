@@ -5,6 +5,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
+  /* ... Aapka saara purana CSS as it is rahega ... */
   :root {
     --bg: #0d0d0f;
     --surface: #141417;
@@ -113,7 +114,7 @@
     color: var(--muted);
   }
 
-  /* Role selector — custom pill toggle */
+  /* Role selector */
   .role-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -226,7 +227,7 @@
 
   .toggle-pw:hover { color: var(--text); }
 
-  /* Password strength bar */
+  /* Strength bar */
   .strength-bar {
     height: 3px;
     border-radius: 2px;
@@ -315,7 +316,7 @@
   }
 
   .btn-register.loading .btn-spinner { display: block; }
-  .btn-register.loading .btn-text    { display: none; }
+  .btn-register.loading .btn-text     { display: none; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -349,6 +350,17 @@
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  /* NEW: OTP SECTION STYLE */
+  .otp-reveal {
+    display: none;
+    margin-top: 10px;
+    animation: fadeUp 0.4s ease;
+    border: 1px dashed var(--accent);
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(201,169,110,0.05);
+  }
 </style>
 
 <div class="register-wrap">
@@ -360,7 +372,6 @@
       <div class="card-sub">Join EaseMyCollab today</div>
     </div>
 
-    <!-- Role toggle -->
     <div class="role-toggle">
       <div class="role-option">
         <input type="radio" name="role" id="roleInfluencer" value="influencer" checked>
@@ -380,24 +391,20 @@
       </div>
     </div>
 
-    <!-- Global error -->
     <div class="global-err" id="globalErr"></div>
 
-    <!-- Username -->
     <div class="field-group">
       <label class="field-label">Username</label>
       <input type="text" id="username" class="field-input" placeholder="Choose a username" autocomplete="username">
       <div class="error-msg" id="usernameErr">Username is required</div>
     </div>
 
-    <!-- Email -->
     <div class="field-group">
       <label class="field-label">Email</label>
       <input type="email" id="email" class="field-input" placeholder="your@email.com" autocomplete="email">
       <div class="error-msg" id="emailErr">Enter a valid email address</div>
     </div>
 
-    <!-- Password -->
     <div class="field-group">
       <label class="field-label">Password</label>
       <div class="pw-wrap">
@@ -409,11 +416,19 @@
       <div class="error-msg" id="passwordErr">Password must be at least 6 characters</div>
     </div>
 
+    <div class="otp-reveal" id="otpSection">
+      <div class="field-group">
+        <label class="field-label" style="color: var(--accent);">Verification Code (OTP)</label>
+        <input type="text" id="otp" class="field-input" placeholder="Enter 6-digit code" style="text-align: center; letter-spacing: 4px; font-weight: bold;">
+        <div class="error-msg" id="otpErr">Please enter the OTP</div>
+      </div>
+    </div>
+
     <div class="divider"></div>
 
     <button class="btn-register" id="registerBtn" onclick="register()">
       <div class="btn-spinner"></div>
-      <span class="btn-text">Create Account ✦</span>
+      <span class="btn-text" id="btnLabel">Create Account ✦</span>
     </button>
 
     <div class="login-link">
@@ -424,7 +439,9 @@
 </div>
 
 <script>
-  // ── Password visibility ──
+  let otpSent = false;
+
+  // Visibility toggle
   function togglePw() {
     const pw  = document.getElementById("password");
     const btn = document.getElementById("toggleBtn");
@@ -432,19 +449,17 @@
     btn.textContent = pw.type === "password" ? "👁" : "🙈";
   }
 
-  // ── Password strength ──
+  // Password strength
   document.getElementById("password").addEventListener("input", function () {
     const val  = this.value;
     const fill = document.getElementById("strengthFill");
     const text = document.getElementById("strengthText");
-
     let score = 0;
     if (val.length >= 6)  score++;
     if (val.length >= 10) score++;
     if (/[A-Z]/.test(val)) score++;
     if (/[0-9]/.test(val)) score++;
     if (/[^a-zA-Z0-9]/.test(val)) score++;
-
     const levels = [
       { pct: "0%",   color: "transparent",          label: "" },
       { pct: "25%",  color: "#f87171",               label: "Weak" },
@@ -452,7 +467,6 @@
       { pct: "75%",  color: "#a3e635",               label: "Good" },
       { pct: "100%", color: "var(--success)",        label: "Strong" },
     ];
-
     const lvl = val.length === 0 ? levels[0] : levels[Math.min(score, 4)];
     fill.style.width      = lvl.pct;
     fill.style.background = lvl.color;
@@ -460,24 +474,20 @@
     text.style.color      = lvl.color;
   });
 
-  // ── Clear errors on input ──
-  ["username", "email", "password"].forEach(id => {
-    document.getElementById(id).addEventListener("input", () => {
-      document.getElementById(id).classList.remove("error");
-      document.getElementById(id + "Err").classList.remove("show");
-      document.getElementById("globalErr").style.display = "none";
-    });
+  // Clear errors
+  ["username", "email", "password", "otp"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.addEventListener("input", () => {
+        el.classList.remove("error");
+        document.getElementById(id + "Err").classList.remove("show");
+        document.getElementById("globalErr").style.display = "none";
+      });
+    }
   });
 
-  // ── Enter to submit ──
-  document.addEventListener("keydown", e => {
-    if (e.key === "Enter") register();
-  });
-
-  // ── Validate ──
   function validate() {
     let ok = true;
-
     const username = document.getElementById("username").value.trim();
     const email    = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
@@ -487,24 +497,31 @@
       document.getElementById("usernameErr").classList.add("show");
       ok = false;
     }
-
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!email || !emailOk) {
       document.getElementById("email").classList.add("error");
       document.getElementById("emailErr").classList.add("show");
       ok = false;
     }
-
     if (!password || password.length < 6) {
       document.getElementById("password").classList.add("error");
       document.getElementById("passwordErr").classList.add("show");
       ok = false;
     }
+    
+    // Validate OTP only if already sent
+    if (otpSent) {
+      const otpVal = document.getElementById("otp").value.trim();
+      if (!otpVal) {
+        document.getElementById("otp").classList.add("error");
+        document.getElementById("otpErr").classList.add("show");
+        ok = false;
+      }
+    }
 
     return ok;
   }
 
-  // ── Register ──
   function register() {
     if (!validate()) {
       document.getElementById("registerCard").classList.add("shake");
@@ -513,57 +530,75 @@
     }
 
     const btn       = document.getElementById("registerBtn");
+    const label     = document.getElementById("btnLabel");
     const globalErr = document.getElementById("globalErr");
     const role      = document.querySelector('input[name="role"]:checked').value;
+    const username  = document.getElementById("username").value.trim();
+    const email     = document.getElementById("email").value.trim();
+    const password  = document.getElementById("password").value;
 
     btn.disabled = true;
     btn.classList.add("loading");
-    globalErr.style.display = "none";
 
-    fetch("http://127.0.0.1:8000/api/register/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: document.getElementById("username").value.trim(),
-        email:    document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value,
-        role:     role
+    // PHASE 1: Send OTP
+    if (!otpSent) {
+      fetch("http://127.0.0.1:8000/api/send-otp/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username })
       })
-    })
-    .then(res => res.json())
-    .then(data => {
-      // If API returns an error field
-      if (data.error || data.detail || data.username || data.email) {
-        const msg = data.error || data.detail
-          || (data.username && data.username[0])
-          || (data.email && data.email[0])
-          || "Registration failed. Please try again.";
-
+      .then(res => res.json())
+      .then(data => {
         btn.disabled = false;
         btn.classList.remove("loading");
-        globalErr.textContent    = msg;
-        globalErr.style.display  = "block";
-        document.getElementById("registerCard").classList.add("shake");
-        setTimeout(() => document.getElementById("registerCard").classList.remove("shake"), 400);
-        return;
-      }
-
-      // Success
-      btn.classList.remove("loading");
-      btn.style.background = "rgba(74,222,128,0.15)";
-      btn.style.color      = "var(--success)";
-      btn.style.border     = "1px solid rgba(74,222,128,0.25)";
-      btn.querySelector(".btn-text").style.display = "flex";
-      btn.querySelector(".btn-text").textContent   = "✓ Account created!";
-
-      setTimeout(() => window.location.href = "/login/", 900);
-    })
-    .catch(() => {
-      btn.disabled = false;
-      btn.classList.remove("loading");
-      globalErr.textContent   = "Could not connect to server. Try again.";
-      globalErr.style.display = "block";
-    });
+        if (data.error) {
+          globalErr.textContent = data.error;
+          globalErr.style.display = "block";
+        } else {
+          otpSent = true;
+          document.getElementById("otpSection").style.display = "block";
+          label.textContent = "Verify & Join ✦";
+          // Disable main fields to prevent changes after OTP sent
+          ["username", "email", "password"].forEach(id => document.getElementById(id).readOnly = true);
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        globalErr.textContent = "Server connection failed.";
+        globalErr.style.display = "block";
+      });
+    } 
+    // PHASE 2: Register with OTP
+    else {
+      const otp = document.getElementById("otp").value.trim();
+      fetch("http://127.0.0.1:8000/api/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password, role, otp })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error || data.detail) {
+          btn.disabled = false;
+          btn.classList.remove("loading");
+          globalErr.textContent = data.error || data.detail || "Registration failed.";
+          globalErr.style.display = "block";
+        } else {
+          btn.classList.remove("loading");
+          btn.style.background = "rgba(74,222,128,0.15)";
+          btn.style.color = "var(--success)";
+          label.textContent = "✓ Welcome aboard!";
+          setTimeout(() => window.location.href = "/login/", 1200);
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        globalErr.textContent = "Error during verification.";
+        globalErr.style.display = "block";
+      });
+    }
   }
 </script>
 

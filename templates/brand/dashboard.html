@@ -15,74 +15,30 @@
     --muted: #6b6870;
   }
 
-  body {
-    background: var(--bg);
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
-  }
-
-  .dashboard-wrap {
-    padding: 48px 32px;
-    max-width: 1200px;
-    margin: auto;
-  }
-
-  .dash-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 20px;
-  }
-
-  .dash-title {
-    font-size: 28px;
-    font-family: 'Playfair Display';
-    margin: 0;
-  }
-
-  .btn-create {
-    padding: 12px 20px;
-    background: var(--accent);
-    border-radius: 10px;
-    text-decoration: none;
-    color: black;
-    font-weight: 600;
-    transition: 0.3s;
-  }
-
-  .btn-create:hover { background: var(--accent2); }
-
-  .campaign-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-  }
-
-  .campaign-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  .campaign-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--accent);
-  }
-
-  .campaign-title { font-size: 18px; margin-bottom: 8px; font-weight: 600; }
-  .campaign-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-  
+  body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .dashboard-wrap { padding: 48px 32px; max-width: 1200px; margin: auto; }
+  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  .dash-title { font-size: 28px; font-family: 'Playfair Display'; margin: 0; }
+  .btn-create { padding: 12px 20px; background: var(--accent); border-radius: 10px; text-decoration: none; color: black; font-weight: 600; transition: 0.3s; }
+  .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+  .campaign-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; cursor: pointer; transition: 0.2s; }
+  .campaign-card:hover { transform: translateY(-3px); border-color: var(--accent); }
   .loading-text { color: var(--accent); font-style: italic; }
+
+  /* REVIEW MODAL STYLES */
+  #reviewModal {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #1a1a1c; border: 1px solid var(--accent); padding: 30px; border-radius: 20px;
+    z-index: 1001; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+  .review-input { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; margin: 10px 0; border-radius: 8px; }
+  .btn-submit-rev { background: var(--accent); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
 </style>
 
 <div class="dashboard-wrap">
   <div class="dash-header">
-    <h1 class="dash-title">Campaign Dashboard</h1>
+    <h1 class="dash-title">Brand Dashboard</h1>
     <a href="/create-campaign/" class="btn-create">+ Create Campaign</a>
   </div>
 
@@ -91,16 +47,76 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="overlay" onclick="closeReviewModal()"></div>
+<div id="reviewModal">
+    <h3 style="font-family: 'Playfair Display'; margin-top: 0;">Rate Collaboration</h3>
+    <p style="font-size: 12px; color: var(--muted);">How was your experience with this influencer?</p>
+    
+    <label style="font-size: 13px;">Rating (1-5)</label>
+    <input type="number" id="ratingScore" class="review-input" min="1" max="5" value="5">
+    
+    <label style="font-size: 13px;">Feedback</label>
+    <textarea id="reviewComment" class="review-input" rows="3" placeholder="Great work on the content!"></textarea>
+    
+    <button onclick="submitReview()" class="btn-submit-rev">Submit Review</button>
+    <button onclick="closeReviewModal()" style="background:transparent; border:none; color:gray; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+</div>
+
 <script>
-// Global variables
 let openedCampaign = null;
+let activeAppId = null; // Track karke rakhne ke liye ki kis influencer ko rate kar rahe hain
 const token = localStorage.getItem("token");
 
-// 1. UPDATE STATUS FUNCTION (Bahar rakha hai taaki HTML buttons ise dhoond sakein)
+// 1. MODAL FUNCTIONS
+function openReviewModal(appId, event) {
+    if(event) event.stopPropagation();
+    activeAppId = appId;
+    document.getElementById('reviewModal').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+// 2. SUBMIT REVIEW API CALL
+async function submitReview() {
+    const rating = document.getElementById('ratingScore').value;
+    const comment = document.getElementById('reviewComment').value;
+
+    if (rating < 1 || rating > 5) { alert("Please give a rating between 1 and 5"); return; }
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/post-review/`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token 
+            },
+            body: JSON.stringify({ 
+                application_id: activeAppId,
+                rating: rating,
+                comment: comment
+            })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            alert("Review submitted! ⭐");
+            closeReviewModal();
+            location.reload();
+        } else {
+            alert(data.error || "Failed to submit review");
+        }
+    } catch (err) {
+        alert("Server error. Please try again.");
+    }
+}
+
+// 3. UPDATE STATUS (Aapka purana function)
 async function updateStatus(appId, newStatus, event) {
     if (event) event.stopPropagation();
-    if (!token) return;
-
     try {
         const res = await fetch(`http://127.0.0.1:8000/api/application/${appId}/update/`, {
             method: "POST",
@@ -110,28 +126,14 @@ async function updateStatus(appId, newStatus, event) {
             },
             body: JSON.stringify({ status: newStatus })
         });
-
-        if (res.ok) {
-            alert("Status Updated: " + newStatus);
-            location.reload(); 
-        } else {
-            const data = await res.json();
-            alert("Error: " + (data.error || "Failed to update"));
-        }
-    } catch (err) {
-        alert("Server connection failed.");
-    }
+        if (res.ok) { location.reload(); }
+    } catch (err) { alert("Action failed."); }
 }
 
-// 2. TOGGLE APPLICANTS FUNCTION
+// 4. TOGGLE APPLICANTS (Aapka updated UI list)
 async function toggleApplicants(campaignId) {
     const section = document.getElementById(`applicants-${campaignId}`);
-    if (openedCampaign === campaignId) {
-        section.innerHTML = "";
-        openedCampaign = null;
-        return;
-    }
-
+    if (openedCampaign === campaignId) { section.innerHTML = ""; openedCampaign = null; return; }
     openedCampaign = campaignId;
     section.innerHTML = "<p class='loading-text'>Loading applicants...</p>";
 
@@ -140,81 +142,59 @@ async function toggleApplicants(campaignId) {
             headers: { "Authorization": "Bearer " + token }
         });
         const apps = await res.json();
+        section.innerHTML = apps.length === 0 ? "<p style='font-size:12px; color:var(--muted)'>No applicants yet</p>" : "";
 
-        if (apps.length === 0) {
-            section.innerHTML = "<p style='font-size:12px; color:var(--muted)'>No applicants yet</p>";
-            return;
-        }
-
-        section.innerHTML = "";
         apps.forEach(app => {
             const div = document.createElement("div");
-            div.style.padding = "10px";
+            div.style.padding = "12px";
             div.style.borderBottom = "1px solid #333";
+            div.style.background = "#1a1a1c";
+            div.style.borderRadius = "8px";
+            div.style.marginBottom = "5px";
+            
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:var(--accent); cursor:pointer;" onclick="event.stopPropagation(); window.location.href='/profile/?user_id=${app.influencer_user_id}'">
-                        👤 ${app.influencer_name || 'Undefined'}
+                    <span style="color:var(--accent); cursor:pointer; font-weight:500;" onclick="event.stopPropagation(); window.location.href='/profile/?user_id=${app.influencer_user_id}'">
+                        👤 ${app.influencer_name}
                     </span>
                     <div>
                         ${app.status === 'pending' ? `
-                            <button onclick="updateStatus(${app.id}, 'accepted', event)" style="background:#4ade80; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px; color:black; font-weight:bold;">Accept</button>
-                            <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#f87171; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; color:white;">Reject</button>
-                        ` : `<span style="font-size:12px; color:gray;">${app.status.toUpperCase()}</span>`}
+                            <button onclick="updateStatus(${app.id}, 'accepted', event)" style="background:#4ade80; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; margin-right:5px; font-weight:bold;">Accept</button>
+                            <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#f87171; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:white;">Reject</button>
+                        ` : `
+                            <span style="font-size:11px; color:var(--muted); margin-right:10px;">${app.status.toUpperCase()}</span>
+                            ${app.status === 'accepted' ? `<button onclick="openReviewModal(${app.id}, event)" style="background:var(--accent); border:none; padding:4px 10px; border-radius:5px; font-size:11px; cursor:pointer;">⭐ Rate</button>` : ''}
+                        `}
                     </div>
                 </div>
             `;
             section.appendChild(div);
         });
-    } catch (err) {
-        section.innerHTML = "Error loading list.";
-    }
+    } catch (err) { section.innerHTML = "Error."; }
 }
 
-// 3. PAGE LOAD LOGIC
+// Aapka Page Load Logic wahi rahega...
 document.addEventListener("DOMContentLoaded", function() {
-    if (!token) {
-        window.location.href = "/login/";
-        return;
-    }
-
     const container = document.getElementById("campaign-container");
-
     async function loadCampaigns() {
         try {
             const response = await fetch("http://127.0.0.1:8000/api/my-campaigns/", {
                 headers: { "Authorization": "Bearer " + token }
             });
-
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                window.location.href = "/login/";
-                return;
-            }
-
             const data = await response.json();
             container.innerHTML = "";
-
-            if (!data || data.length === 0) {
-                container.innerHTML = "<p>No campaigns yet</p>";
-                return;
-            }
-
-            data.sort((a, b) => b.id - a.id);
-            data.forEach(c => {
+            data.sort((a, b) => b.id - a.id).forEach(c => {
                 const card = document.createElement("div");
                 card.className = "campaign-card";
                 card.innerHTML = `
                     <div class="campaign-title">${c.title}</div>
-                    <div class="campaign-desc">${c.description || "No description provided."}</div>
-                    <div id="applicants-${c.id}" class="applicants-list" style="margin-top:10px;"></div>
+                    <div class="campaign-desc">${c.description || "No description."}</div>
+                    <div id="applicants-${c.id}" style="margin-top:10px;"></div>
                 `;
                 card.onclick = () => toggleApplicants(c.id);
                 container.appendChild(card);
             });
-        } catch (error) {
-            container.innerHTML = "<p style='color:red;'>Failed to load campaigns.</p>";
-        }
+        } catch (e) { container.innerHTML = "Error."; }
     }
     loadCampaigns();
 });

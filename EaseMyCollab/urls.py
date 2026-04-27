@@ -87,12 +87,13 @@ from campaigns.views import (
     MyCampaignsAPI,
     DeleteCampaignAPI,
     InfluencerApplicationsView,
-    UpdateApplicationStatusView
+    UpdateApplicationStatusView,
+    PostReviewView,
 )
 from collaborations.views import AcceptApplicationView
 from campaigns.views_frontend import create_campaign_page
 from accounts.views_frontend import profile_page, login_page, home_page, register_page
-
+from accounts.views import SendOTPView, RegisterView, ForgotPasswordView, ResetPasswordView
 # Frontend Views (Jinhe alag file me nahi dala unhe yahi define kar rahe hain)
 def brand_dashboard(request):
     return render(request, 'brand/dashboard.html')
@@ -105,6 +106,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/', RegisterView.as_view()),
     path('api/login/', LoginView.as_view(), name='login'),
+    path('api/send-otp/', SendOTPView.as_view(), name='send-otp'),
+    
+    # Forgot Password Flow
+    path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    path('api/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
     
     # --- API Endpoints ---
     path('api/campaigns/', CampaignListView.as_view()),
@@ -119,7 +125,9 @@ urlpatterns = [
     path('api/influencer/my-applications/', InfluencerApplicationsView.as_view()),
     path('api/profile/', ProfileView.as_view()), # Common Profile API
     path('api/application/<int:application_id>/update/', UpdateApplicationStatusView.as_view()),
-
+    path('api/post-review/', PostReviewView.as_view(), name='post-review'),
+    
+    
     # --- Frontend Pages (HTML) ---
     path('', home_page, name='home'),
     path('login/', login_page, name='login_page'),

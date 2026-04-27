@@ -30,24 +30,36 @@ class CampaignListView(APIView):
     
 from .models import Application
 
-class ApplyCampaignView(APIView):
+from django.shortcuts import get_object_or_404
+from influencers.models import InfluencerProfile # Isse import zaroori hai
 
+class ApplyCampaignView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, campaign_id):
+        # 1. Check karo user influencer hai ya nahi
+        if request.user.role != 'influencer':
+            return Response({"error": "Only influencers can apply for campaigns"}, status=400)
 
-        influencer = request.user.influencerprofile
+        # 2. PROFILE SAFETY CHECK (Yahan galti thi)
+        # Agar profile nahi bani hogi, toh ye line use turant bana degi
+        influencer, created = InfluencerProfile.objects.get_or_create(user=request.user)
 
-        # prevent duplicate
-        if Application.objects.filter(campaign_id=campaign_id, influencer=influencer).exists():
-            return Response({"error": "Already applied"})
+        # 3. Campaign check karo ki valid hai ya nahi
+        campaign = get_object_or_404(Campaign, id=campaign_id)
 
+        # 4. Prevent duplicate application
+        if Application.objects.filter(campaign=campaign, influencer=influencer).exists():
+            return Response({"error": "You have already applied for this campaign"}, status=400)
+
+        # 5. Application create karo
         Application.objects.create(
-            campaign_id=campaign_id,
-            influencer=influencer
+            campaign=campaign,
+            influencer=influencer,
+            status='pending' # Default status hamesha pending rakho
         )
 
-        return Response({"message": "Applied successfully"})
+        return Response({"message": "Applied successfully!"}, status=201)
 
 from .serializers import ApplicationSerializer;
 class ViewApplicantsView(APIView):
@@ -133,3 +145,47 @@ class UpdateApplicationStatusView(APIView):
             return Response({"error": "Invalid status"}, status=400)
         except Application.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
+        
+from .models import Application, Review
+
+class PostReviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        app_id = request.data.get("application_id")
+        rating = request.data.get("rating")
+        comment = request.data.get("comment", "")
+
+        try:
+            # 1. Application dhoondo
+            application = Application.objects.get(id=app_id)
+
+            # 2. Check karo application accepted hai ya nahi
+            if application.status != 'accepted':
+                return Response({"error": "You can only review accepted collaborations"}, status=400)
+
+            # 3. Check karo ki kya review pehle hi diya ja chuka hai
+            if Review.objects.filter(application=application, reviewer=request.user).exists():
+                return Response({"error": "Review already submitted"}, status=400)
+
+            # 4. Decide karo reviewee kaun hai
+            # Agar Brand review de raha hai toh reviewee Influencer hoga, and vice versa
+            if request.user == application.campaign.brand.user:
+                reviewee = application.influencer.user
+            else:
+                reviewee = application.campaign.brand.user
+
+            # 5. Review create karo
+            Review.objects.create(
+                application=application,
+                reviewer=request.user,
+                reviewee=reviewee,
+                rating=rating,
+                comment=comment
+            )
+            return Response({"message": "Review submitted successfully!"}, status=201)
+
+        except Application.DoesNotExist:
+            return Response({"error": "Application not found"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
