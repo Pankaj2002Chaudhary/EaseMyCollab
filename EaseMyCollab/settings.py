@@ -128,17 +128,32 @@ WSGI_APPLICATION = 'EaseMyCollab.wsgi.application'
 # }
 # settings.py
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'easemycollab_db',       # Database ka naam jo aap banayenge
-        'USER': 'postgres',              # Aapka Postgres username
-        'PASSWORD': 'Pankaj@123',     # Aapka Postgres password
-        'HOST': 'localhost',             # Abhi local ke liye localhost
-        'PORT': '5432',                  # Default Postgres port
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'easemycollab_db',       # Database ka naam jo aap banayenge
+#         'USER': 'postgres',              # Aapka Postgres username
+#         'PASSWORD': 'Pankaj@123',     # Aapka Postgres password
+#         'HOST': 'localhost',             # Abhi local ke liye localhost
+#         'PORT': '5432',                  # Default Postgres port
+#     }
+# }
+import dj_database_url
+import os
 
+# Neon se mili string yahan dalein ya Render dashboard mein environment variable banayein
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_FpeKw6OguRD2@ep-damp-resonance-aot6q1yx.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require')
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=0,
+        # ssl_require=True
+    )
+}
+DATABASES['default']['OPTIONS'] = {
+    'sslmode': 'require',
+}
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
