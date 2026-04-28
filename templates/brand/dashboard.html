@@ -88,7 +88,7 @@ async function submitReview() {
     if (rating < 1 || rating > 5) { alert("Please give a rating between 1 and 5"); return; }
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api/post-review/`, {
+        const res = await fetch(`https://easemycollab.onrender.com/api/post-review/`, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
@@ -118,7 +118,7 @@ async function submitReview() {
 async function updateStatus(appId, newStatus, event) {
     if (event) event.stopPropagation();
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api/application/${appId}/update/`, {
+        const res = await fetch(`https://easemycollab.onrender.com/api/application/${appId}/update/`, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
@@ -138,7 +138,7 @@ async function toggleApplicants(campaignId) {
     section.innerHTML = "<p class='loading-text'>Loading applicants...</p>";
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api/applicants/${campaignId}/`, {
+        const res = await fetch(`https://easemycollab.onrender.com/api/applicants/${campaignId}/`, {
             headers: { "Authorization": "Bearer " + token }
         });
         const apps = await res.json();
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById("campaign-container");
     async function loadCampaigns() {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/my-campaigns/", {
+            const response = await fetch("https://easemycollab.onrender.com/api/my-campaigns/", {
                 headers: { "Authorization": "Bearer " + token }
             });
             const data = await response.json();

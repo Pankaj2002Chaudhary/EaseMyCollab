@@ -542,7 +542,7 @@
 
     // PHASE 1: Send OTP
     if (!otpSent) {
-      fetch("http://127.0.0.1:8000/api/send-otp/", {
+      fetch("https://easemycollab.onrender.com/api/send-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username })
@@ -572,7 +572,7 @@
     // PHASE 2: Register with OTP
     else {
       const otp = document.getElementById("otp").value.trim();
-      fetch("http://127.0.0.1:8000/api/register/", {
+      fetch("https://easemycollab.onrender.com/api/register/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password, role, otp })

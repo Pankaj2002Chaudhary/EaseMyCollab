@@ -273,7 +273,7 @@
   }
 
   function loadProfile() {
-    let apiUrl = "http://127.0.0.1:8000/api/profile/";
+    let apiUrl = "https://easemycollab.onrender.com/api/profile/";
     if (targetUserId) apiUrl += `?user_id=${targetUserId}`;
 
     fetch(apiUrl, {
@@ -309,7 +309,7 @@
       youtube: document.getElementById("youtube").value,
     };
 
-    fetch("http://127.0.0.1:8000/api/profile/", {
+    fetch("https://easemycollab.onrender.com/api/profile/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -615,7 +615,7 @@
   }
 
   // ── Fetch campaigns ──
-  fetch("http://127.0.0.1:8000/api/campaigns/")
+  fetch("https://easemycollab.onrender.com/api/campaigns/")
     .then(res => {
       if (!res.ok) throw new Error();
       return res.json();
@@ -665,7 +665,7 @@
     btn.disabled = true;
     btn.textContent = "Applying…";
 
-    fetch(`http://127.0.0.1:8000/api/apply/${id}/`, {
+    fetch(`https://easemycollab.onrender.com/api/apply/${id}/`, {
       method: "POST",
       headers: { "Authorization": "Bearer " + token }
     })
