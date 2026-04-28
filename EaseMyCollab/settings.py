@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -50,7 +51,7 @@ REST_FRAMEWORK = {
     ),
 }
 SIMPLE_JWT = {
-    'ACCESS_TOKE_LIFETIME' : timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=60),
     'AUTH_HEADER_TYPES':('Bearer',),
 }
 
