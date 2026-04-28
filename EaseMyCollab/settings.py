@@ -23,11 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ms=4q@pnu%=d53*rm=kdtt8+1@@_%v&lys+f*1##g7=env_@zr'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['*']
-
-
+# settings.py
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['easemycollab.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -96,13 +94,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = 'accounts.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -142,16 +141,17 @@ WSGI_APPLICATION = 'EaseMyCollab.wsgi.application'
 import dj_database_url
 import os
 
-# Neon se mili string yahan dalein ya Render dashboard mein environment variable banayein
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_FpeKw6OguRD2@ep-damp-resonance-aot6q1yx.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require')
+# settings.py
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 DATABASES = {
     'default': dj_database_url.config(
         default=DATABASE_URL,
-        conn_max_age=0,
-        # ssl_require=True
+        conn_max_age=600, # Connection efficiency ke liye 600 thik hai
     )
 }
+
+# Neon ke liye ye line compulsory hai
 DATABASES['default']['OPTIONS'] = {
     'sslmode': 'require',
 }
