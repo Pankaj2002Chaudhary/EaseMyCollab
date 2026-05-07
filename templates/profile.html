@@ -1,240 +1,244 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg-color: #fcfaf7;
-    --card-bg: #ffffff;
-    --text-main: #1a1a1a;
-    --text-muted: #666666;
-    --accent: #1a1a1a;
-    --border: #e5e0d8;
-    --input-focus: #d1cbc1;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(229, 224, 216, 0.8);
+    --accent-dark: #1a1a1a;
+    --soft-gold: #c9a96e;
   }
 
-  .profile-container {
-    padding: 80px 20px;
-    background: var(--bg-color);
+  .profile-wrapper {
+    padding: 100px 20px;
+    background: radial-gradient(circle at top right, #fdfbf9, #fcfaf7);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
-  .profile-card {
-    width: 100%;
-    max-width: 750px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 50px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  .profile-header {
+  /* Profile Header / Banner Area */
+  .profile-hero {
+    max-width: 900px;
+    margin: 0 auto 40px;
     text-align: center;
-    margin-bottom: 50px;
+    position: relative;
   }
 
-  .avatar-circle {
-    width: 80px;
-    height: 80px;
-    background: var(--text-main);
-    border-radius: 50%;
+  .avatar-stack {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 25px;
+  }
+
+  .avatar-main {
+    width: 100%;
+    height: 100%;
+    background: var(--accent-dark);
+    border-radius: 35% 65% 70% 30% / 30% 40% 60% 70%; /* Organic Shape */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 40px;
     color: #fff;
-    margin: 0 auto 20px;
     font-family: 'Playfair Display', serif;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: 0.5s ease;
   }
 
-  .profile-title {
+  .avatar-stack:hover .avatar-main {
+    border-radius: 50%;
+    transform: rotate(5deg);
+  }
+
+  .profile-name {
     font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    color: var(--text-main);
-    margin-bottom: 8px;
+    font-size: 42px;
     font-weight: 700;
+    color: var(--accent-dark);
+    margin: 0;
   }
 
-  .profile-subtitle {
-    color: var(--text-muted);
-    font-size: 15px;
-    letter-spacing: 0.3px;
-  }
-
-  /* Form Layout */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-  }
-
-  .full-width { grid-column: 1 / span 2; }
-
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .input-group label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--text-main);
+  .profile-tagline {
+    color: var(--soft-gold);
     font-weight: 600;
-  }
-
-  .form-control {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    color: var(--text-main);
     font-size: 14px;
-    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 10px;
+  }
+
+  /* Main Card Grid */
+  .profile-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+  }
+
+  .side-info, .main-form {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+  }
+
+  .info-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .form-group {
+    margin-bottom: 30px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--accent-dark);
+  }
+
+  .custom-input {
     width: 100%;
-    box-sizing: border-box;
+    border: none;
+    border-bottom: 1.5px solid #e5e0d8;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 16px;
+    color: var(--accent-dark);
+    transition: 0.3s;
+    border-radius: 0;
   }
 
-  .form-control:focus {
+  .custom-input:focus {
     outline: none;
-    border-color: var(--input-focus);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.02);
+    border-color: var(--soft-gold);
   }
 
-  .form-control:disabled {
-    background: #fcfaf7;
-    border-color: transparent;
-    padding-left: 0;
+  .custom-input:disabled {
+    border-bottom-color: transparent;
     font-weight: 500;
-    cursor: default;
-    color: var(--text-main);
+    color: #444;
   }
 
-  textarea.form-control {
-    min-height: 120px;
-    line-height: 1.6;
+  /* Social Icons */
+  .social-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #f0ede8;
+  }
+
+  .social-icon {
+    width: 32px;
+    height: 32px;
+    background: #fcfaf7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
   }
 
   /* Buttons */
-  .action-area {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  .btn {
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
+  .btn-float {
+    background: var(--accent-dark);
+    color: #fff;
     border: none;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: 0.3s;
   }
 
-  .btn-edit {
-    background: var(--text-main);
-    color: #fff;
-  }
-
-  .btn-edit:hover { opacity: 0.9; transform: translateY(-1px); }
-
-  .btn-save {
-    background: #1e7e34;
-    color: #fff;
+  .btn-float:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
   }
 
   .btn-cancel {
-    background: #fff;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
+    background: transparent;
+    color: #888;
+    border: 1px solid #e5e0d8;
+    margin-right: 10px;
   }
 
-  /* Toast Notification */
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    padding: 16px 24px;
-    border-radius: 12px;
-    background: var(--text-main);
-    color: #fff;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 2000;
-    display: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  }
-  .toast.show { display: block; animation: slideUp 0.3s ease-out; }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-  @media (max-width: 650px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .full-width { grid-column: auto; }
-    .profile-card { padding: 30px 20px; }
+  @media (max-width: 800px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .avatar-main { width: 90px; height: 90px; }
   }
 </style>
 
-<div class="profile-container">
-  <div class="profile-card">
-    
-    <div class="profile-header">
-      <div class="avatar-circle" id="avatarIcon">✦</div>
-      <h1 class="profile-title" id="headerName">Profile</h1>
-      <p class="profile-subtitle" id="profileSubtitle">Professional identity and contact details</p>
+<div class="profile-wrapper">
+  <div class="profile-hero">
+    <div class="avatar-stack">
+      <div class="avatar-main" id="avatarIcon">✦</div>
     </div>
+    <h1 class="profile-name" id="headerName">Profile Settings</h1>
+    <div class="profile-tagline" id="profileSubtitle">InfluSync Verified Creator</div>
+  </div>
 
-    <div class="form-grid">
-      <div class="input-group full-width">
-        <label>Display Name</label>
-        <input type="text" id="name" class="form-control" placeholder="Not set" disabled>
+  <div class="profile-grid">
+    <div class="side-info">
+      <span class="info-label">Connected Socials</span>
+      
+      <div class="social-box">
+        <div class="social-icon">IG</div>
+        <input type="text" id="instagram" class="custom-input" placeholder="@handle" disabled>
       </div>
 
-      <div class="input-group">
-        <label>Primary Niche</label>
-        <input type="text" id="industry" class="form-control" placeholder="e.g. Lifestyle" disabled>
+      <div class="social-box">
+        <div class="social-icon">YT</div>
+        <input type="text" id="youtube" class="custom-input" placeholder="Channel" disabled>
       </div>
 
-      <div class="input-group">
-        <label>Website / Portfolio</label>
-        <input type="text" id="website" class="form-control" placeholder="yoursite.com" disabled>
-      </div>
-
-      <div class="input-group full-width">
-        <label>About / Bio</label>
-        <textarea id="bio" class="form-control" placeholder="Describe your creative journey..." disabled></textarea>
-      </div>
-
-      <div class="input-group">
-        <label>Instagram Handle</label>
-        <input type="text" id="instagram" class="form-control" placeholder="@username" disabled>
-      </div>
-
-      <div class="input-group">
-        <label>YouTube Channel</label>
-        <input type="text" id="youtube" class="form-control" placeholder="Link to channel" disabled>
+      <div style="margin-top: 40px;">
+        <span class="info-label">Personal Site</span>
+        <input type="text" id="website" class="custom-input" placeholder="yoursite.com" disabled>
       </div>
     </div>
 
-    <div class="action-area" id="btnRow">
+    <div class="main-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="name" class="custom-input" placeholder="Your Name" disabled>
       </div>
 
+      <div class="form-group">
+        <label>Niche / Category</label>
+        <input type="text" id="industry" class="custom-input" placeholder="Fashion, Tech, etc." disabled>
+      </div>
+
+      <div class="form-group">
+        <label>About Me</label>
+        <textarea id="bio" class="custom-input" style="min-height: 100px; border-bottom: 1px solid #e5e0d8;" placeholder="Tell your story..." disabled></textarea>
+      </div>
+
+      <div id="btnRow" style="text-align: right; margin-top: 20px;">
+        </div>
+    </div>
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1a1a1a; color:#fff; padding:12px 30px; border-radius:50px; font-size:14px; display:none; z-index:1000; box-shadow:0 10px 30px rgba(0,0,0,0.2);"></div>
 
 <script>
   const token = localStorage.getItem("token");
@@ -244,8 +248,8 @@
   function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = "toast show";
-    setTimeout(() => t.classList.remove("show"), 3000);
+    t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 3000);
   }
 
   function fillFields(data) {
@@ -263,10 +267,10 @@
 
     const btnRow = document.getElementById("btnRow");
     if (data.is_owner) {
-      btnRow.innerHTML = `<button class="btn btn-edit" onclick="enableEdit()">Edit Profile</button>`;
+      btnRow.innerHTML = `<button class="btn-float" onclick="enableEdit()">Edit Details</button>`;
     } else {
       btnRow.innerHTML = ``; 
-      document.getElementById("profileSubtitle").textContent = "Public View";
+      document.getElementById("profileSubtitle").textContent = "Public Profile";
     }
   }
 
@@ -285,15 +289,15 @@
   loadProfile();
 
   function enableEdit() {
-    document.querySelectorAll(".form-control").forEach(el => el.disabled = false);
+    document.querySelectorAll(".custom-input").forEach(el => el.disabled = false);
     document.getElementById("btnRow").innerHTML = `
-      <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
-      <button class="btn btn-save" onclick="saveProfile()">Update Profile</button>
+      <button class="btn-float btn-cancel" onclick="cancelEdit()">Cancel</button>
+      <button class="btn-float" onclick="saveProfile()">Save Changes</button>
     `;
   }
 
   function cancelEdit() {
-    document.querySelectorAll(".form-control").forEach(el => el.disabled = true);
+    document.querySelectorAll(".custom-input").forEach(el => el.disabled = true);
     loadProfile();
   }
 
@@ -317,7 +321,7 @@
     })
     .then(res => res.json())
     .then(() => {
-      showToast("Profile updated successfully");
+      showToast("Profile updated!");
       cancelEdit();
     })
     .catch(() => showToast("Failed to save profile"));
