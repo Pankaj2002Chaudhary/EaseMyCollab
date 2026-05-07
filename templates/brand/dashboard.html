@@ -2,72 +2,176 @@
 {% load static %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #0d0d0f;
-    --surface: #141417;
-    --border: rgba(255,255,255,0.07);
-    --accent: #c9a96e;
-    --accent2: #e8c99a;
-    --text: #f0ece4;
-    --muted: #6b6870;
+    --bg-color: #fcfaf7;       /* Soft Beige */
+    --card-bg: #ffffff;
+    --text-main: #1a1a1a;     /* Deep Black */
+    --text-muted: #666666;
+    --accent: #1a1a1a;        /* Solid Black Buttons */
+    --border: #e5e0d8;        /* Beige border */
+    --success: #166534;
+    --danger: #991b1b;
   }
 
-  body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); }
-  .dashboard-wrap { padding: 48px 32px; max-width: 1200px; margin: auto; }
-  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-  .dash-title { font-size: 28px; font-family: 'Playfair Display'; margin: 0; }
-  .btn-create { padding: 12px 20px; background: var(--accent); border-radius: 10px; text-decoration: none; color: black; font-weight: 600; transition: 0.3s; }
-  .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
-  .campaign-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 16px; cursor: pointer; transition: 0.2s; }
-  .campaign-card:hover { transform: translateY(-3px); border-color: var(--accent); }
-  .loading-text { color: var(--accent); font-style: italic; }
+  body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    margin: 0;
+  }
 
-  /* REVIEW MODAL STYLES */
+  .dashboard-wrap {
+    padding: 60px 20px;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dash-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .btn-create {
+    padding: 12px 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+
+  .btn-create:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  .campaign-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 28px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  }
+
+  .campaign-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+    border-color: #d1cbc1;
+  }
+
+  .campaign-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .campaign-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  /* APPLICANTS SECTION */
+  .applicant-item {
+    padding: 14px;
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .status-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #eee;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(4px); z-index: 1000;
+  }
+
   #reviewModal {
     display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #1a1a1c; border: 1px solid var(--accent); padding: 30px; border-radius: 20px;
-    z-index: 1001; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    background: white; padding: 40px; border-radius: 20px;
+    z-index: 1001; width: 90%; max-width: 400px;
+    border: 1px solid var(--border);
   }
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
-  .review-input { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; margin: 10px 0; border-radius: 8px; }
-  .btn-submit-rev { background: var(--accent); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+
+  .review-input {
+    width: 100%; border: 1px solid var(--border); padding: 12px;
+    margin: 10px 0 20px; border-radius: 8px; font-family: inherit; font-size: 14px;
+  }
+
+  .btn-submit-rev {
+    background: var(--accent); color: white; border: none;
+    padding: 14px; border-radius: 8px; font-weight: 600; width: 100%; cursor: pointer;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <div class="dashboard-wrap">
   <div class="dash-header">
     <h1 class="dash-title">Brand Dashboard</h1>
-    <a href="/create-campaign/" class="btn-create">+ Create Campaign</a>
+    <a href="/create-campaign/" class="btn-create">+ New Campaign</a>
   </div>
 
   <div class="campaign-grid" id="campaign-container">
-    <p class="loading-text">Loading your campaigns...</p>
+    <p style="color: var(--text-muted)">Loading your workspace...</p>
   </div>
 </div>
 
 <div class="modal-overlay" id="overlay" onclick="closeReviewModal()"></div>
 <div id="reviewModal">
-    <h3 style="font-family: 'Playfair Display'; margin-top: 0;">Rate Collaboration</h3>
-    <p style="font-size: 12px; color: var(--muted);">How was your experience with this influencer?</p>
+    <h3 style="font-family: 'Playfair Display'; font-size: 24px; margin-bottom: 8px;">Rate Collaboration</h3>
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Share your experience with the influencer.</p>
     
-    <label style="font-size: 13px;">Rating (1-5)</label>
+    <label style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Rating (1-5)</label>
     <input type="number" id="ratingScore" class="review-input" min="1" max="5" value="5">
     
-    <label style="font-size: 13px;">Feedback</label>
-    <textarea id="reviewComment" class="review-input" rows="3" placeholder="Great work on the content!"></textarea>
+    <label style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Feedback</label>
+    <textarea id="reviewComment" class="review-input" rows="3" placeholder="Describe the collaboration..."></textarea>
     
     <button onclick="submitReview()" class="btn-submit-rev">Submit Review</button>
-    <button onclick="closeReviewModal()" style="background:transparent; border:none; color:gray; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+    <button onclick="closeReviewModal()" style="background:transparent; border:none; color:var(--text-muted); width:100%; margin-top:16px; cursor:pointer; font-size: 13px;">Dismiss</button>
 </div>
 
 <script>
 let openedCampaign = null;
-let activeAppId = null; // Track karke rakhne ke liye ki kis influencer ko rate kar rahe hain
+let activeAppId = null;
 const token = localStorage.getItem("token");
 
-// 1. MODAL FUNCTIONS
 function openReviewModal(appId, event) {
     if(event) event.stopPropagation();
     activeAppId = appId;
@@ -80,100 +184,69 @@ function closeReviewModal() {
     document.getElementById('overlay').style.display = 'none';
 }
 
-// 2. SUBMIT REVIEW API CALL
 async function submitReview() {
     const rating = document.getElementById('ratingScore').value;
     const comment = document.getElementById('reviewComment').value;
-
-    if (rating < 1 || rating > 5) { alert("Please give a rating between 1 and 5"); return; }
+    if (rating < 1 || rating > 5) { alert("Invalid rating"); return; }
 
     try {
         const res = await fetch(`https://easemycollab.onrender.com/api/post-review/`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token 
-            },
-            body: JSON.stringify({ 
-                application_id: activeAppId,
-                rating: rating,
-                comment: comment
-            })
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify({ application_id: activeAppId, rating, comment })
         });
-
-        const data = await res.json();
-        if (res.ok) {
-            alert("Review submitted! ⭐");
-            closeReviewModal();
-            location.reload();
-        } else {
-            alert(data.error || "Failed to submit review");
-        }
-    } catch (err) {
-        alert("Server error. Please try again.");
-    }
+        if (res.ok) { location.reload(); }
+    } catch (err) { alert("Error connecting to server."); }
 }
 
-// 3. UPDATE STATUS (Aapka purana function)
 async function updateStatus(appId, newStatus, event) {
     if (event) event.stopPropagation();
     try {
         const res = await fetch(`https://easemycollab.onrender.com/api/application/${appId}/update/`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
             body: JSON.stringify({ status: newStatus })
         });
         if (res.ok) { location.reload(); }
-    } catch (err) { alert("Action failed."); }
+    } catch (err) { console.error(err); }
 }
 
-// 4. TOGGLE APPLICANTS (Aapka updated UI list)
 async function toggleApplicants(campaignId) {
     const section = document.getElementById(`applicants-${campaignId}`);
     if (openedCampaign === campaignId) { section.innerHTML = ""; openedCampaign = null; return; }
+    
     openedCampaign = campaignId;
-    section.innerHTML = "<p class='loading-text'>Loading applicants...</p>";
+    section.innerHTML = "<p style='font-size:12px; color:var(--text-muted)'>Fetching...</p>";
 
     try {
         const res = await fetch(`https://easemycollab.onrender.com/api/applicants/${campaignId}/`, {
             headers: { "Authorization": "Bearer " + token }
         });
         const apps = await res.json();
-        section.innerHTML = apps.length === 0 ? "<p style='font-size:12px; color:var(--muted)'>No applicants yet</p>" : "";
+        section.innerHTML = apps.length === 0 ? "<p style='font-size:12px; color:var(--text-muted)'>No pending applications</p>" : "";
 
         apps.forEach(app => {
             const div = document.createElement("div");
-            div.style.padding = "12px";
-            div.style.borderBottom = "1px solid #333";
-            div.style.background = "#1a1a1c";
-            div.style.borderRadius = "8px";
-            div.style.marginBottom = "5px";
-            
+            div.className = "applicant-item";
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:var(--accent); cursor:pointer; font-weight:500;" onclick="event.stopPropagation(); window.location.href='/profile/?user_id=${app.influencer_user_id}'">
-                        👤 ${app.influencer_name}
-                    </span>
+                    <span style="font-weight:500;">👤 ${app.influencer_name}</span>
                     <div>
                         ${app.status === 'pending' ? `
-                            <button onclick="updateStatus(${app.id}, 'accepted', event)" style="background:#4ade80; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; margin-right:5px; font-weight:bold;">Accept</button>
-                            <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#f87171; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:white;">Reject</button>
+                            <button onclick="updateStatus(${app.id}, 'accepted', event)" style="background:#166534; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">Accept</button>
+                            <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#991b1b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">Reject</button>
                         ` : `
-                            <span style="font-size:11px; color:var(--muted); margin-right:10px;">${app.status.toUpperCase()}</span>
-                            ${app.status === 'accepted' ? `<button onclick="openReviewModal(${app.id}, event)" style="background:var(--accent); border:none; padding:4px 10px; border-radius:5px; font-size:11px; cursor:pointer;">⭐ Rate</button>` : ''}
+                            <span class="status-tag">${app.status}</span>
+                            ${app.status === 'accepted' ? `<button onclick="openReviewModal(${app.id}, event)" style="background:var(--accent); color:white; border:none; padding:6px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-left:8px;">Rate</button>` : ''}
                         `}
                     </div>
                 </div>
             `;
             section.appendChild(div);
         });
-    } catch (err) { section.innerHTML = "Error."; }
+    } catch (err) { section.innerHTML = "Error loading data."; }
 }
 
-// Aapka Page Load Logic wahi rahega...
 document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById("campaign-container");
     async function loadCampaigns() {
@@ -188,13 +261,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 card.className = "campaign-card";
                 card.innerHTML = `
                     <div class="campaign-title">${c.title}</div>
-                    <div class="campaign-desc">${c.description || "No description."}</div>
-                    <div id="applicants-${c.id}" style="margin-top:10px;"></div>
+                    <div class="campaign-desc">${c.description || "Active collaboration campaign."}</div>
+                    <div id="applicants-${c.id}" style="margin-top:15px;"></div>
                 `;
                 card.onclick = () => toggleApplicants(c.id);
                 container.appendChild(card);
             });
-        } catch (e) { container.innerHTML = "Error."; }
+        } catch (e) { container.innerHTML = "Failed to load campaigns."; }
     }
     loadCampaigns();
 });
