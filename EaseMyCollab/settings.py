@@ -25,11 +25,13 @@ SECRET_KEY = 'django-insecure-ms=4q@pnu%=d53*rm=kdtt8+1@@_%v&lys+f*1##g7=env_@zr
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG=True
 ALLOWED_HOSTS = ['easemycollab.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -94,6 +96,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'accounts.User'
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -143,19 +146,45 @@ import dj_database_url
 import os
 
 # settings.py
-DATABASE_URL = os.getenv('DATABASE_URL')
+# DATABASE_URL = os.getenv('DATABASE_URL')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600, # Connection efficiency ke liye 600 thik hai
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=DATABASE_URL,
+#         conn_max_age=600, # Connection efficiency ke liye 600 thik hai
+#     )
+# }
 
-# Neon ke liye ye line compulsory hai
-DATABASES['default']['OPTIONS'] = {
-    'sslmode': 'require',
-}
+# # Neon ke liye ye line compulsory hai
+# DATABASES['default']['OPTIONS'] = {
+#     'sslmode': 'require',
+# }
+# import os
+# import dj_database_url
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    # Production / Neon / Render DB
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600
+        )
+    }
+
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
+    }
+
+else:
+    # Local development DB
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -203,3 +232,11 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True

@@ -23,36 +23,55 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+import random
+
+from django.conf import settings
+from django.core.cache import cache
+from django.core.mail import send_mail
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from .models import User
+
+
 class SendOTPView(APIView):
     def post(self, request):
         email = request.data.get('email', '').strip().lower()
         username = request.data.get('username', '').strip()
-        
 
-        # 1. Check if email/username already exist
         if User.objects.filter(email=email).exists():
-            return Response({"error": "Bhai, ye email pehle se registered hai!"}, status=400)
-        
+            return Response(
+                {"error": "Bhai, ye email pehle se registered hai!"},
+                status=400
+            )
+
         if User.objects.filter(username=username).exists():
-            return Response({"error": "Ye username koi le chuka hai!"}, status=400)
+            return Response(
+                {"error": "Ye username koi le chuka hai!"},
+                status=400
+            )
 
-        # 2. Generate and store OTP
         otp = str(random.randint(100000, 999999))
-        cache.set(f'otp_{email}', otp, timeout=300) # 5 mins valid
 
-        # 3. Send Mail
+        cache.set(f'otp_{email}', otp, timeout=300)
+
         try:
             send_mail(
                 'Verify EaseMyCollab Account',
                 f'Aapka registration OTP hai: {otp}',
-                'noreply@easemycollab.com',
+                settings.EMAIL_HOST_USER,
                 [email],
                 fail_silently=False,
             )
-            return Response({"message": "OTP Sent, Please Check!"})
-        except Exception:
-            return Response({"error": "Email not sent."}, status=500)
 
+            return Response({"message": "OTP Sent, Please Check!"})
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=500
+            )
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
