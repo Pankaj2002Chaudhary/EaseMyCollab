@@ -2,165 +2,235 @@
 {% load static %}
 
 {% block content %}
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #0d0d0f;
-  --surface: #141417;
-  --surface2: #1c1c21;
-  --border: rgba(255,255,255,0.07);
-  --accent: #c9a96e;
-  --accent2: #e8c99a;
-  --text: #f0ece4;
-  --muted: #6b6870;
-}
+  :root {
+    --bg-color: #fcfaf7;       /* Soft Beige */
+    --card-bg: #ffffff;
+    --text-main: #1a1a1a;     /* Deep Black */
+    --text-muted: #666666;
+    --accent: #1a1a1a;        /* Solid Black */
+    --border: #e5e0d8;        /* Subtle beige border */
+    --input-bg: #fafafa;
+  }
 
-body {
-  background: var(--bg);
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-}
+  body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    margin: 0;
+  }
 
-/* Wrapper */
-.campaign-wrap {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-}
+  .campaign-wrap {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
 
-/* Card */
-.campaign-card {
-  width: 100%;
-  max-width: 500px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-}
+  .campaign-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+    animation: fadeIn 0.5s ease-out;
+  }
 
-/* Title */
-.card-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  text-align: center;
-  margin-bottom: 25px;
-}
+  .card-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
 
-/* Inputs */
-.field {
-  margin-bottom: 15px;
-}
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
 
-.field input,
-.field textarea {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  color: var(--text);
-  font-size: 14px;
-  outline: none;
-}
+  .card-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
 
-.field textarea {
-  resize: none;
-  height: 100px;
-}
+  /* Form Styling */
+  .field-group {
+    margin-bottom: 24px;
+  }
 
-.field input:focus,
-.field textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(201,169,110,0.2);
-}
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+  }
 
-/* Button */
-.btn-create {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--accent), #a8812e);
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  color: #0d0d0f;
-  cursor: pointer;
-  transition: 0.3s;
-}
+  .field-input, .field-textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    color: var(--text-main);
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: 0.2s;
+  }
 
-.btn-create:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, var(--accent2), var(--accent));
-}
+  .field-textarea {
+    resize: none;
+    height: 120px;
+  }
 
+  .field-input:focus, .field-textarea:focus {
+    outline: none;
+    border-color: var(--text-main);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(26, 26, 26, 0.03);
+  }
+
+  .btn-create {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+  }
+
+  .btn-create:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .btn-create:active {
+    transform: translateY(0);
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .back-link:hover { color: var(--text-main); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
 <div class="campaign-wrap">
   <div class="campaign-card">
-
-    <div class="card-title">🚀 Create Campaign</div>
-
-    <div class="field">
-      <input id="title" placeholder="Campaign Title">
+    <div class="card-header">
+      <div class="card-title">Launch Campaign</div>
+      <p class="card-subtitle">Define your requirements for influencers</p>
     </div>
 
-    <div class="field">
-      <textarea id="description" placeholder="Campaign Description"></textarea>
+    <div class="field-group">
+      <label class="field-label">Campaign Title</label>
+      <input id="title" class="field-input" placeholder="e.g. Summer Collection 2026">
     </div>
 
-    <div class="field">
-      <input id="budget" placeholder="Budget Range (e.g. ₹10k - ₹50k)">
+    <div class="field-group">
+      <label class="field-label">Brief Description</label>
+      <textarea id="description" class="field-textarea" placeholder="What are the goals of this collaboration?"></textarea>
     </div>
 
-    <div class="field">
-      <input id="deadline" type="date">
+    <div class="field-group">
+      <label class="field-label">Budget Range</label>
+      <input id="budget" class="field-input" placeholder="e.g. ₹20,000 - ₹50,000">
     </div>
 
-    <button class="btn-create" onclick="createCampaign()">
-      Create Campaign ✦
+    <div class="field-group">
+      <label class="field-label">Submission Deadline</label>
+      <input id="deadline" type="date" class="field-input">
+    </div>
+
+    <button class="btn-create" id="submitBtn" onclick="createCampaign()">
+      Create Campaign
     </button>
 
+    <a href="/dashboard/" class="back-link">← Back to Dashboard</a>
   </div>
 </div>
 
 <script>
-function createCampaign() {
+async function createCampaign() {
+    const btn = document.getElementById("submitBtn");
+    const titleVal = document.getElementById("title").value.trim();
+    const descVal = document.getElementById("description").value.trim();
+    const budgetVal = document.getElementById("budget").value.trim();
+    const deadlineVal = document.getElementById("deadline").value;
+    
     let token = localStorage.getItem("token");
 
     if (!token) {
-        alert("Login required");
+        alert("Session expired. Please login again.");
         window.location.href = "/login/";
         return;
     }
 
-    fetch("/api/create-campaign/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-            title: title.value,
-            description: description.value,
-            budget_range: budget.value,
-            deadline: deadline.value,
-            status: "open"
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.message) {
-            alert("Campaign created ");
-            window.location.href = "/dashboard/";
+    if (!titleVal || !descVal) {
+        alert("Title and Description are required.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Publishing...";
+
+    try {
+        const res = await fetch("https://easemycollab.onrender.com/api/create-campaign/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                title: titleVal,
+                description: descVal,
+                budget_range: budgetVal,
+                deadline: deadlineVal,
+                status: "open"
+            })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            btn.innerText = "✓ Published";
+            btn.style.background = "#166534";
+            setTimeout(() => {
+                window.location.href = "/dashboard/";
+            }, 1000);
         } else {
-            alert(JSON.stringify(data));
+            alert("Error: " + JSON.stringify(data));
+            btn.disabled = false;
+            btn.innerText = "Create Campaign";
         }
-    });
+    } catch (err) {
+        alert("Server connection failed.");
+        btn.disabled = false;
+        btn.innerText = "Create Campaign";
+    }
 }
 </script>
-
 {% endblock %}

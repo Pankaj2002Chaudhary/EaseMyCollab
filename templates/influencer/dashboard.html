@@ -1,52 +1,187 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
 <style>
-    .dash-container { padding: 80px 20px; max-width: 1000px; margin: 0 auto; }
-    .status-badge { 
-        padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase;
-    }
-    .status-pending { background: rgba(201,169,110,0.1); color: var(--accent); }
-    .status-accepted { background: rgba(74,222,128,0.1); color: #4ade80; }
-    
-    .brand-link { color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500; }
-    .brand-link:hover { text-decoration: underline; }
+  :root {
+    --bg-color: #fcfaf7;
+    --card-bg: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+    --accent: #1a1a1a;
+    --border: #e5e0d8;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    margin: 0;
+  }
+
+  .dash-container {
+    padding: 80px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .page-header {
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .page-subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* APPLICATION LIST ITEMS */
+  .app-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 24px 32px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s ease;
+  }
+
+  .app-card:hover {
+    border-color: #d1cbc1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  }
+
+  .campaign-info h3 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .brand-tag {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .brand-link {
+    color: var(--text-main);
+    text-decoration: underline;
+    font-weight: 500;
+    cursor: pointer;
+    text-underline-offset: 3px;
+  }
+
+  /* STATUS BADGES */
+  .status-wrapper {
+    text-align: right;
+  }
+
+  .status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+  }
+
+  .status-pending { background: #f3f0eb; color: #7a6d5a; }
+  .status-accepted { background: #e6f4ea; color: #1e7e34; }
+  .status-rejected { background: #fce8e8; color: #c62828; }
+
+  .date-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    display: block;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .app-card { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .status-wrapper { text-align: left; }
+  }
 </style>
 
 <div class="dash-container">
-    <h1 style="font-family:'Playfair Display'; color:var(--text); margin-bottom:10px;">My Applications</h1>
-    <p style="color:var(--muted); margin-bottom:40px;">Track your collaboration requests with brands</p>
+    <div class="page-header">
+        <h1 class="page-title">My Applications</h1>
+        <p class="page-subtitle">Track your collaboration history and status</p>
+    </div>
 
     <div id="app-list">
-        </div>
+        <p style="color: var(--text-muted);">Loading your history...</p>
+    </div>
 </div>
 
 <script>
-    function loadApps() {
+    async function loadApps() {
         const token = localStorage.getItem("token");
-        fetch("/api/influencer/my-applications/", {
-            headers: { "Authorization": "Bearer " + token }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById("app-list");
-            if(data.length === 0) {
-                container.innerHTML = `<p style="color:var(--muted)">No applications yet. <a href="/" style="color:var(--accent)">Explore Campaigns</a></p>`;
+        const container = document.getElementById("app-list");
+
+        try {
+            const res = await fetch("https://easemycollab.onrender.com/api/influencer/my-applications/", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            const data = await res.json();
+            
+            if(!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p style="color:var(--text-muted); margin-bottom:20px;">You haven't applied to any campaigns yet.</p>
+                        <a href="/" style="color:var(--text-main); font-weight:600; text-decoration:none; border-bottom:2px solid var(--text-main);">Browse Campaigns →</a>
+                    </div>`;
                 return;
             }
+
             container.innerHTML = data.map(app => `
-                <div style="background:var(--surface); border:1px solid var(--border); padding:20px; border-radius:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <h3 style="color:var(--text); margin-bottom:5px;">${app.campaign_title}</h3>
-                        <p style="font-size:13px; color:var(--muted)">Brand: <span class="brand-link" onclick="window.location.href='/profile/?user_id=${app.brand_user_id}'">${app.brand_name}</span></p>
+                <div class="app-card">
+                    <div class="campaign-info">
+                        <h3>${app.campaign_title || 'Featured Campaign'}</h3>
+                        <p class="brand-tag">Collaborating with 
+                            <span class="brand-link" onclick="window.location.href='/profile/?user_id=${app.brand_user_id}'">
+                                ${app.brand_name}
+                            </span>
+                        </p>
                     </div>
-                    <div style="text-align:right;">
-                        <span class="status-badge status-${app.status.toLowerCase()}">${app.status}</span>
-                        <p style="font-size:11px; color:var(--muted); margin-top:8px;">Applied on: ${app.applied_at}</p>
+                    <div class="status-wrapper">
+                        <span class="status-badge status-${(app.status || 'pending').toLowerCase()}">
+                            ${app.status || 'Pending'}
+                        </span>
+                        <span class="date-text">Applied on ${new Date(app.applied_at).toLocaleDateString()}</span>
                     </div>
                 </div>
             `).join('');
-        });
+
+        } catch (err) {
+            container.innerHTML = `<p style="color:var(--text-muted)">Unable to load applications at this moment.</p>`;
+        }
     }
-    loadApps();
+    
+    document.addEventListener("DOMContentLoaded", loadApps);
 </script>
 {% endblock %}

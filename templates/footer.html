@@ -1,22 +1,12 @@
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
 <style>
   .site-footer {
-    background: #0d0d0f;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 48px 40px 28px;
-    font-family: 'DM Sans', sans-serif;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .site-footer::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 50%; transform: translateX(-50%);
-    width: 60%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #c9a96e, transparent);
+    background: #fcfaf7; /* Match global bg */
+    border-top: 1px solid #e5e0d8;
+    padding: 80px 20px 40px;
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
   }
 
   .footer-inner {
@@ -27,95 +17,101 @@
   .footer-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
     gap: 40px;
     flex-wrap: wrap;
-    margin-bottom: 36px;
+    margin-bottom: 60px;
   }
 
-  .footer-brand {}
+  .footer-brand {
+    flex: 1;
+    min-width: 250px;
+  }
 
   .footer-logo {
     font-family: 'Playfair Display', serif;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
-    color: #f0ece4;
-    letter-spacing: -0.3px;
-    margin-bottom: 8px;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    text-decoration: none;
+    display: inline-block;
   }
 
-  .footer-logo span { color: #c9a96e; }
+  .footer-logo span {
+    font-style: italic;
+    font-weight: 400;
+  }
 
   .footer-tagline {
-    font-size: 12px;
-    color: #6b6870;
+    font-size: 14px;
+    color: #666666;
     line-height: 1.6;
-    max-width: 220px;
+    max-width: 280px;
   }
 
-  .footer-links {
+  .footer-links-wrap {
     display: flex;
-    gap: 60px;
+    gap: 80px;
     flex-wrap: wrap;
   }
 
-  .footer-col {}
-
   .footer-col-title {
-    font-size: 9px;
-    letter-spacing: 1.5px;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    color: #c9a96e;
-    font-weight: 500;
-    margin-bottom: 14px;
+    letter-spacing: 1px;
+    color: #1a1a1a;
+    margin-bottom: 20px;
   }
 
-  .footer-col a {
+  .footer-link {
     display: block;
-    font-size: 13px;
-    color: #6b6870;
+    font-size: 14px;
+    color: #666666;
     text-decoration: none;
-    margin-bottom: 9px;
-    transition: color 0.2s ease;
+    margin-bottom: 12px;
+    transition: 0.2s;
   }
 
-  .footer-col a:hover { color: #f0ece4; }
+  .footer-link:hover {
+    color: #1a1a1a;
+    transform: translateX(3px);
+  }
 
   .footer-bottom {
+    padding-top: 30px;
+    border-top: 1px solid #e5e0d8;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.05);
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 20px;
   }
 
   .footer-copy {
-    font-size: 12px;
-    color: #6b6870;
+    font-size: 13px;
+    color: #888888;
   }
 
-  .footer-copy span { color: #c9a96e; }
-
-  .footer-heart {
-    font-size: 12px;
-    color: #6b6870;
+  .footer-credit {
+    font-size: 13px;
+    color: #888888;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
   }
 
-  .footer-heart::before {
-    content: '♥';
-    color: #c9a96e;
-    font-size: 11px;
+  .dot {
+    width: 4px;
+    height: 4px;
+    background: #d1cbc1;
+    border-radius: 50%;
   }
 
   @media (max-width: 600px) {
-    .site-footer { padding: 36px 20px 20px; }
-    .footer-top { flex-direction: column; gap: 28px; }
-    .footer-links { gap: 32px; }
+    .site-footer { padding: 60px 20px 30px; }
+    .footer-links-wrap { gap: 40px; }
     .footer-bottom { flex-direction: column; align-items: flex-start; }
   }
 </style>
@@ -125,29 +121,36 @@
 
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="footer-logo">Ease<span>My</span>Collab</div>
-        <div class="footer-tagline">Connecting brands with the right voices. Campaigns that convert.</div>
+        <a href="/" class="footer-logo">Ease<span>My</span>Collab</a>
+        <p class="footer-tagline">
+          The curated marketplace connecting high-impact creators with visionary brands.
+        </p>
       </div>
 
-      <div class="footer-links">
+      <div class="footer-links-wrap">
         <div class="footer-col">
-          <div class="footer-col-title">Platform</div>
-          <a href="/dashboard/">Dashboard</a>
-          <a href="/create-campaign/">Create Campaign</a>
-          <a href="/profile/">My Profile</a>
+          <h4 class="footer-col-title">Navigation</h4>
+          <a href="/dashboard/" class="footer-link">Dashboard</a>
+          <a href="/create-campaign/" class="footer-link">Launch Campaign</a>
+          <a href="/profile/" class="footer-link">Creator Profile</a>
         </div>
+        
         <div class="footer-col">
-          <div class="footer-col-title">Company</div>
-          <a href="#">About</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy Policy</a>
+          <h4 class="footer-col-title">Legal</h4>
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">Contact Support</a>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <div class="footer-copy">© 2026 <span>EaseMyCollab</span>. All rights reserved.</div>
-      <div class="footer-heart">Built with care in India</div>
+      <div class="footer-copy">
+        © 2026 EaseMyCollab. Dedicated to the creator economy.
+      </div>
+      <div class="footer-credit">
+        Based in India <span class="dot"></span> Designed for Global
+      </div>
     </div>
 
   </div>

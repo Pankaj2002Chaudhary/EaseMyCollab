@@ -1,694 +1,290 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #0d0d0f;
-    --surface: #141417;
-    --surface2: #1c1c21;
-    --border: rgba(255,255,255,0.07);
-    --accent: #c9a96e;
-    --accent2: #e8c99a;
-    --text: #f0ece4;
-    --muted: #6b6870;
-    --success: #4ade80;
+    --bg-color: #fcfaf7;       /* Soft Beige */
+    --card-bg: #ffffff;
+    --text-main: #1a1a1a;     /* Deep Black */
+    --text-muted: #666666;
+    --accent: #1a1a1a;        /* Black Buttons */
+    --border: #e5e0d8;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    margin: 0;
   }
 
-  /* ── HERO ── */
+  /* ── HERO SECTION ── */
   .hero {
-    min-height: 88vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 120px 20px 80px;
     text-align: center;
-    padding: 80px 24px 60px;
-    position: relative;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,169,110,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(201,169,110,0.05) 0%, transparent 50%),
-      radial-gradient(ellipse 40% 40% at 90% 80%, rgba(201,169,110,0.04) 0%, transparent 50%),
-      var(--bg);
-  }
-
-  /* Decorative grid lines */
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(201,169,110,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(201,169,110,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-    pointer-events: none;
-  }
-
-  .hero-inner {
-    position: relative;
-    z-index: 1;
-    max-width: 720px;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeIn 0.8s ease-out;
   }
 
   .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 16px;
-    background: rgba(201,169,110,0.1);
-    border: 1px solid rgba(201,169,110,0.2);
+    display: inline-block;
+    padding: 6px 14px;
+    background: #f0ede8;
+    border: 1px solid var(--border);
     border-radius: 50px;
     font-size: 11px;
-    letter-spacing: 1.5px;
+    font-weight: 600;
     text-transform: uppercase;
-    color: var(--accent2);
-    font-weight: 500;
-    margin-bottom: 28px;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  .hero-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.5; transform: scale(0.8); }
+    letter-spacing: 1px;
+    margin-bottom: 30px;
   }
 
   .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(42px, 7vw, 72px);
+    font-size: clamp(48px, 8vw, 84px);
+    line-height: 0.95;
     font-weight: 900;
-    line-height: 1.08;
-    letter-spacing: -1.5px;
-    color: var(--text);
-    margin-bottom: 20px;
-    animation: fadeUp 0.5s 0.1s ease both;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
   }
-
-  .hero-title .gold { color: var(--accent); }
 
   .hero-sub {
-    font-size: 17px;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 480px;
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 550px;
     margin: 0 auto 40px;
-    font-weight: 300;
-    animation: fadeUp 0.5s 0.2s ease both;
+    line-height: 1.6;
   }
 
-  .hero-cta-row {
+  .hero-btns {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     justify-content: center;
-    flex-wrap: wrap;
-    animation: fadeUp 0.5s 0.3s ease both;
   }
 
-  .btn-primary-gold {
-    padding: 14px 28px;
-    background: linear-gradient(135deg, var(--accent), #a8812e);
-    color: #0d0d0f;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
+  .btn-main {
+    padding: 16px 32px;
+    background: var(--accent);
+    color: white;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(201,169,110,0.3);
-  }
-
-  .btn-primary-gold:hover {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(201,169,110,0.4);
-    color: #0d0d0f;
-    text-decoration: none;
-  }
-
-  .btn-ghost {
-    padding: 14px 28px;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
+    border-radius: 8px;
     font-weight: 500;
-    border-radius: 12px;
+    font-size: 15px;
+    transition: 0.2s;
+  }
+
+  .btn-outline {
+    padding: 16px 32px;
+    background: transparent;
+    color: var(--text-main);
     border: 1px solid var(--border);
-    cursor: pointer;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.2s;
   }
 
-  .btn-ghost:hover {
-    background: rgba(255,255,255,0.04);
-    color: var(--text);
-    border-color: rgba(255,255,255,0.12);
-    text-decoration: none;
-  }
-
-  /* Scroll hint */
-  .scroll-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    animation: fadeUp 0.5s 0.6s ease both;
-  }
-
-  .scroll-hint span {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .scroll-arrow {
-    width: 20px;
-    height: 20px;
-    border-right: 1.5px solid var(--muted);
-    border-bottom: 1.5px solid var(--muted);
-    transform: rotate(45deg);
-    animation: bounce 1.8s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: rotate(45deg) translateY(0); opacity: 0.4; }
-    50%       { transform: rotate(45deg) translateY(4px); opacity: 1; }
-  }
+  .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
+  .btn-outline:hover { background: #f5f2ee; }
 
   /* ── STATS STRIP ── */
   .stats-strip {
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    padding: 28px 40px;
-  }
-
-  .stats-strip-inner {
-    max-width: 900px;
-    margin: 0 auto;
+    padding: 40px 20px;
+    margin-top: 60px;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 30px;
   }
 
   .stat-item { text-align: center; }
+  .stat-num { display: block; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .stat-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
 
-  .stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--accent2);
-    display: block;
-  }
-
-  .stat-desc {
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-weight: 500;
-    margin-top: 3px;
-  }
-
-  /* ── CAMPAIGNS SECTION ── */
-  .campaigns-section {
-    padding: 72px 32px 80px;
-    max-width: 1200px;
+  /* ── CAMPAIGN SECTION ── */
+  .campaign-section {
+    padding: 100px 20px;
+    max-width: 1100px;
     margin: 0 auto;
   }
 
-  .section-head {
+  .section-header {
+    margin-bottom: 50px;
     display: flex;
-    align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 36px;
-    flex-wrap: wrap;
-    gap: 16px;
+    align-items: flex-end;
   }
 
-  .section-eyebrow {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
+  .section-header h2 { font-family: 'Playfair Display'; font-size: 32px; margin: 0; }
 
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.4px;
-  }
-
-  /* Filter tabs */
-  .filter-tabs {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .filter-tab {
-    padding: 7px 16px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
-
-  .filter-tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
-
-  .filter-tab.active {
-    background: rgba(201,169,110,0.1);
-    border-color: rgba(201,169,110,0.25);
-    color: var(--accent2);
-  }
-
-  /* Campaign grid */
   .campaign-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 18px;
+    gap: 24px;
   }
 
-  .campaign-card {
-    background: var(--surface);
+  .card {
+    background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 26px 28px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.25s ease;
-    animation: fadeUp 0.5s ease both;
+    border-radius: 12px;
+    padding: 32px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
   }
 
-  .campaign-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent);
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    border-color: #d1cbc1;
   }
 
-  .campaign-card:hover {
-    border-color: rgba(201,169,110,0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  }
-
-  .card-category {
-    font-size: 10px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 500;
-    margin-bottom: 10px;
-  }
-
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 10px;
-    line-height: 1.3;
-  }
-
-  .card-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.65;
-    margin-bottom: 20px;
-    flex: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
+  .card-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .card-title { font-size: 19px; font-weight: 600; margin-bottom: 10px; }
+  .card-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; flex-grow: 1; line-height: 1.5; }
+  
   .card-footer {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    gap: 10px;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
   }
 
-  .card-budget {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent2);
-  }
-
-  .card-budget-label {
-    font-size: 10px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 2px;
-    font-weight: 500;
-  }
-
-  .btn-interested {
-    padding: 10px 20px;
-    background: linear-gradient(135deg, var(--accent), #a8812e);
-    color: #0d0d0f;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: 10px;
+  .card-price { font-weight: 700; font-size: 16px; }
+  .btn-apply {
+    background: var(--accent);
+    color: white;
     border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    box-shadow: 0 3px 12px rgba(201,169,110,0.2);
-  }
-
-  .btn-interested:hover {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(201,169,110,0.35);
-  }
-
-  .btn-interested:disabled {
-    background: rgba(74,222,128,0.15);
-    color: var(--success);
-    border: 1px solid rgba(74,222,128,0.25);
-    box-shadow: none;
-    transform: none;
-    cursor: default;
-  }
-
-  /* Skeleton */
-  .skel-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 26px 28px;
-    height: 240px;
-  }
-
-  .skel {
-    background: linear-gradient(90deg, var(--surface2) 25%, rgba(255,255,255,0.03) 50%, var(--surface2) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
+    padding: 10px 18px;
     border-radius: 6px;
-    margin-bottom: 10px;
-  }
-
-  @keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  /* Empty / error state */
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 72px 32px;
-    border: 1px dashed rgba(255,255,255,0.07);
-    border-radius: 20px;
-  }
-
-  .empty-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.35; }
-  .empty-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); opacity: 0.5; margin-bottom: 8px; }
-  .empty-sub   { font-size: 13px; color: var(--muted); }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 28px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    padding: 12px 22px;
-    border-radius: 50px;
     font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    pointer-events: none;
-    z-index: 9999;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast-success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
-  .toast-error   { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+    cursor: pointer;
+    transition: 0.2s;
   }
 
-  @media (max-width: 640px) {
-    .campaigns-section { padding: 48px 16px 60px; }
-    .hero-title { letter-spacing: -0.8px; }
-    .stats-strip { padding: 20px 16px; }
+  .btn-apply:disabled { background: #e0e0e0; color: #a0a0a0; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 12px 24px;
+    border-radius: 50px; font-size: 14px; display: none; z-index: 1000;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 600px) {
+    .hero-title { font-size: 42px; }
+    .hero-btns { flex-direction: column; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 20px; }
   }
 </style>
 
-<!-- ── HERO ── -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-badge">Now Live — New Campaigns Added Daily</div>
-
-    <h1 class="hero-title">
-      Where Brands Meet<br>
-      <span class="gold">Influential Voices</span>
-    </h1>
-
-    <p class="hero-sub">
-      Discover campaigns that match your niche. Apply in seconds, collaborate with top brands, and grow your influence.
-    </p>
-
-    <div class="hero-cta-row">
-      <a href="#campaigns" class="btn-primary-gold">Explore Campaigns ↓</a>
-      <a href="/register/" class="btn-ghost">Join as Influencer</a>
-    </div>
-  </div>
-
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="scroll-arrow"></div>
-  </div>
-</section>
-
-<!-- ── STATS ── -->
-<div class="stats-strip">
-  <div class="stats-strip-inner">
-    <div class="stat-item">
-      <span class="stat-num" id="statCampaigns">—</span>
-      <div class="stat-desc">Live Campaigns</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">500+</span>
-      <div class="stat-desc">Influencers</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">120+</span>
-      <div class="stat-desc">Brands</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">98%</span>
-      <div class="stat-desc">Satisfaction</div>
-    </div>
+<div class="hero">
+  <div class="hero-badge">Curating Top Brand Collaborations</div>
+  <h1 class="hero-title">Connecting<br>Creators & Brands</h1>
+  <p class="hero-sub">The premier marketplace for influential voices. Apply to high-impact campaigns and scale your digital presence.</p>
+  <div class="hero-btns">
+    <a href="#campaigns" class="btn-main">View Opportunities</a>
+    <a href="/register/" class="btn-outline">Join as Creator</a>
   </div>
 </div>
 
-<!-- ── CAMPAIGNS ── -->
-<section class="campaigns-section" id="campaigns">
+<div class="stats-strip">
+  <div class="stat-item"><span class="stat-num" id="totalCampaigns">—</span><span class="stat-label">Active Gigs</span></div>
+  <div class="stat-item"><span class="stat-num">1.2k+</span><span class="stat-label">Creators</span></div>
+  <div class="stat-item"><span class="stat-num">500+</span><span class="stat-label">Brands</span></div>
+  <div class="stat-item"><span class="stat-num">₹5M+</span><span class="stat-label">Paid Out</span></div>
+</div>
 
-  <div class="section-head">
-    <div>
-      <div class="section-eyebrow">Opportunities</div>
-      <div class="section-title">Latest Campaigns</div>
-    </div>
-    <div class="filter-tabs" id="filterTabs">
-      <button class="filter-tab active" data-filter="all">All</button>
-      <button class="filter-tab" data-filter="fashion">Fashion</button>
-      <button class="filter-tab" data-filter="tech">Tech</button>
-      <button class="filter-tab" data-filter="food">Food</button>
-      <button class="filter-tab" data-filter="lifestyle">Lifestyle</button>
-    </div>
+<section class="campaign-section" id="campaigns">
+  <div class="section-header">
+    <h2>Latest Campaigns</h2>
   </div>
 
   <div class="campaign-grid" id="campaign-list">
-    <div class="skel-card"><div class="skel" style="width:40%;height:12px"></div><div class="skel" style="width:75%;height:20px"></div><div class="skel" style="width:100%;height:14px"></div><div class="skel" style="width:90%;height:14px"></div></div>
-    <div class="skel-card"><div class="skel" style="width:35%;height:12px"></div><div class="skel" style="width:80%;height:20px"></div><div class="skel" style="width:100%;height:14px"></div><div class="skel" style="width:85%;height:14px"></div></div>
-    <div class="skel-card"><div class="skel" style="width:45%;height:12px"></div><div class="skel" style="width:70%;height:20px"></div><div class="skel" style="width:100%;height:14px"></div><div class="skel" style="width:95%;height:14px"></div></div>
+    <p style="color: var(--text-muted)">Scanning for new opportunities...</p>
   </div>
-
 </section>
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
 <script>
   const token = localStorage.getItem("token");
-  let allCampaigns = [];
 
-  function showToast(msg, type = "success") {
-    const t = document.getElementById("toast");
-    t.textContent = (type === "success" ? "✓  " : "✕  ") + msg;
-    t.className = `toast toast-${type} show`;
-    setTimeout(() => t.classList.remove("show"), 3200);
-  }
+  async function loadCampaigns() {
+    const list = document.getElementById("campaign-list");
+    try {
+      const res = await fetch("https://easemycollab.onrender.com/api/campaigns/");
+      const data = await res.json();
+      
+      document.getElementById("totalCampaigns").innerText = data.length;
+      list.innerHTML = "";
 
-  function formatBudget(val) {
-    if (!val) return "—";
-    if (isNaN(val)) return val;
-    return "₹" + Number(val).toLocaleString("en-IN");
-  }
-
-  function renderCampaigns(data) {
-    const container = document.getElementById("campaign-list");
-    container.innerHTML = "";
-
-    if (!data || data.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-title">No campaigns found</div>
-          <div class="empty-sub">Check back soon — new campaigns are added daily.</div>
-        </div>`;
-      return;
-    }
-
-    data.forEach((c, i) => {
-      const card = document.createElement("div");
-      card.className = "campaign-card";
-      card.style.animationDelay = `${i * 0.07}s`;
-      card.innerHTML = `
-        <div class="card-category">${c.industry || c.category || "Campaign"}</div>
-        <div class="card-title">${c.title || "Untitled"}</div>
-        <div class="card-desc">${c.description || "No description provided."}</div>
-        <div class="card-footer">
-          <div>
-            <div class="card-budget-label">Budget</div>
-            <div class="card-budget">${formatBudget(c.budget_range)}</div>
+      data.forEach(c => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <span class="card-cat">${c.category || 'Collaboration'}</span>
+          <h3 class="card-title">${c.title}</h3>
+          <p class="card-desc">${c.description || "No description provided."}</p>
+          <div class="card-footer">
+            <span class="card-price">₹${c.budget_range || 'TBD'}</span>
+            <button class="btn-apply" id="btn-${c.id}" onclick="applyToCampaign(${c.id})">Express Interest</button>
           </div>
-          <button class="btn-interested" id="btn-${c.id}" onclick="applyCampaign(${c.id})">
-            Interested ✦
-          </button>
-        </div>`;
-      container.appendChild(card);
-    });
+        `;
+        list.appendChild(card);
+      });
+    } catch (e) {
+      list.innerHTML = "<p>Unable to load campaigns. Please refresh.</p>";
+    }
   }
 
-  // ── Fetch campaigns ──
-  fetch("https://easemycollab.onrender.com/api/campaigns/")
-    .then(res => {
-      if (!res.ok) throw new Error();
-      return res.json();
-    })
-    .then(data => {
-      allCampaigns = data;
-      document.getElementById("statCampaigns").textContent = data.length;
-      renderCampaigns(data);
-    })
-    .catch(() => {
-      document.getElementById("campaign-list").innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">⚠️</div>
-          <div class="empty-title">Could not load campaigns</div>
-          <div class="empty-sub">Please check your connection and try again.</div>
-        </div>`;
-    });
-
-  // ── Filter tabs ──
-  document.getElementById("filterTabs").addEventListener("click", e => {
-    const tab = e.target.closest(".filter-tab");
-    if (!tab) return;
-
-    document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-
-    const filter = tab.dataset.filter;
-    if (filter === "all") {
-      renderCampaigns(allCampaigns);
-    } else {
-      const filtered = allCampaigns.filter(c =>
-        (c.industry || c.category || "").toLowerCase().includes(filter)
-      );
-      renderCampaigns(filtered);
-    }
-  });
-
-  // ── Apply ──
-  function applyCampaign(id) {
+  async function applyToCampaign(id) {
     if (!token) {
-      showToast("Please login to apply", "error");
-      setTimeout(() => window.location.href = "/login/", 1200);
+      showToast("Please login to apply");
+      setTimeout(() => window.location.href = "/login/", 1500);
       return;
     }
 
     const btn = document.getElementById(`btn-${id}`);
     btn.disabled = true;
-    btn.textContent = "Applying…";
+    btn.innerText = "Applying...";
 
-    fetch(`https://easemycollab.onrender.com/api/apply/${id}/`, {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + token }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error();
-      return res.json();
-    })
-    .then(() => {
-      btn.textContent = "✓ Applied";
-      showToast("Application sent successfully!");
-    })
-    .catch(() => {
+    try {
+      const res = await fetch(`https://easemycollab.onrender.com/api/apply/${id}/`, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token }
+      });
+
+      if (res.ok) {
+        btn.innerText = "✓ Applied";
+        showToast("Application sent successfully");
+      } else {
+        btn.disabled = false;
+        btn.innerText = "Express Interest";
+        showToast("Failed to apply");
+      }
+    } catch (err) {
       btn.disabled = false;
-      btn.textContent = "Interested ✦";
-      showToast("Could not apply. Try again.", "error");
-    });
+      showToast("Network Error");
+    }
   }
 
-  // ── Smooth scroll for hero CTA ──
-  document.querySelector('a[href="#campaigns"]').addEventListener("click", e => {
-    e.preventDefault();
-    document.getElementById("campaigns").scrollIntoView({ behavior: "smooth" });
-  });
-</script>
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 3000);
+  }
 
+  loadCampaigns();
+</script>
 {% endblock %}

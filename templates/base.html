@@ -1,26 +1,108 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EaseMyCollab</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaseMyCollab — Premium Creator Marketplace</title>
 
-    <!-- Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <style>
+        :root {
+            --bg-color: #fcfaf7;       /* Soft Beige */
+            --text-main: #1a1a1a;     /* Deep Black */
+            --border-color: #e5e0d8;  /* Subtle beige border */
+            --accent: #1a1a1a;
+        }
+
+        /* Smoothing the scroll and global styles */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Overriding Bootstrap's default container to be more fluid */
+        .main-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            flex: 1;
+            /* Yahan humne container-fluid jaisa feel diya hai but with control */
+            padding-bottom: 80px; 
+        }
+
+        /* Custom Scrollbar for Premium Feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dcd9d2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c5c2bb;
+        }
+
+        /* Global Utility for Fade-in animation on blocks */
+        .fade-in-section {
+            animation: fadeInPage 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
 
-    {% include 'navbar.html' %}
+    <div class="main-wrapper">
+        {% include 'navbar.html' %}
 
-    <div class="container mt-4">
-        {% block content %}
-        {% endblock %}
+        <main class="content-area">
+            <div class="fade-in-section">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+        {% include 'footer.html' %}
     </div>
 
-    {% include 'footer.html' %}
-<script src="{% static 'js/main.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        // Simple logic to handle global interactions if needed
+        document.addEventListener("DOMContentLoaded", function() {
+            // Check if user is logged in for navbar tweaks
+            const token = localStorage.getItem("token");
+            if(token) {
+                document.body.classList.add('is-logged-in');
+            }
+        });
+    </script>
 </body>
 </html>

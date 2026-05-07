@@ -1,77 +1,77 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #0d0d0f;
-    --surface: #141417;
-    --surface2: #1c1c21;
-    --border: rgba(255,255,255,0.08);
-    --accent: #c9a96e;
-    --accent-bright: #e8c99a;
-    --text: #f0ece4;
-    --muted: #8e8c94;
+    --bg-color: #fcfaf7;
+    --card-bg: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+    --accent: #1a1a1a;
+    --border: #e5e0d8;
+    --input-focus: #d1cbc1;
   }
 
-  /* Main Wrapper */
   .profile-container {
-    padding: 60px 20px;
-    background: var(--bg);
-    min-height: 80vh;
+    padding: 80px 20px;
+    background: var(--bg-color);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
+    font-family: 'Inter', sans-serif;
   }
 
   .profile-card {
     width: 100%;
-    max-width: 650px;
-    background: var(--surface);
+    max-width: 750px;
+    background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
-    position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    border-radius: 16px;
+    padding: 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    animation: fadeIn 0.5s ease-out;
   }
 
-  /* Header Section */
   .profile-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
   }
 
   .avatar-circle {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, var(--accent), #8b6914);
+    width: 80px;
+    height: 80px;
+    background: var(--text-main);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    color: #000;
-    margin: 0 auto 15px;
-    font-weight: bold;
+    font-size: 32px;
+    color: #fff;
+    margin: 0 auto 20px;
+    font-family: 'Playfair Display', serif;
   }
 
   .profile-title {
     font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    color: var(--text);
-    margin-bottom: 5px;
+    font-size: 36px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    font-weight: 700;
   }
 
   .profile-subtitle {
-    color: var(--muted);
-    font-size: 14px;
+    color: var(--text-muted);
+    font-size: 15px;
+    letter-spacing: 0.3px;
   }
 
-  /* Form Grid */
+  /* Form Layout */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 25px;
   }
 
   .full-width { grid-column: 1 / span 2; }
@@ -79,113 +79,111 @@
   .input-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .input-group label {
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent);
+    letter-spacing: 1.2px;
+    color: var(--text-main);
     font-weight: 600;
   }
 
   .form-control {
-    background: var(--surface2);
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 12px 15px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    padding: 14px 16px;
+    color: var(--text-main);
     font-size: 14px;
-    transition: all 0.3s;
-    width: 100% !important; /* Forces width */
+    transition: all 0.2s ease;
+    width: 100%;
     box-sizing: border-box;
   }
 
   .form-control:focus {
     outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.1);
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.02);
   }
 
   .form-control:disabled {
-    background: transparent;
+    background: #fcfaf7;
     border-color: transparent;
     padding-left: 0;
-    color: var(--text);
-    opacity: 1;
+    font-weight: 500;
     cursor: default;
+    color: var(--text-main);
   }
 
   textarea.form-control {
-    min-height: 100px;
-    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
   }
 
   /* Buttons */
   .action-area {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 40px;
+    padding-top: 30px;
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
+    gap: 12px;
   }
 
   .btn {
-    padding: 12px 25px;
+    padding: 12px 28px;
     border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
-    font-family: 'DM Sans', sans-serif;
+    transition: 0.2s;
     border: none;
   }
 
   .btn-edit {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
+    background: var(--text-main);
+    color: #fff;
   }
 
-  .btn-edit:hover {
-    background: var(--accent);
-    color: #000;
-  }
+  .btn-edit:hover { opacity: 0.9; transform: translateY(-1px); }
 
   .btn-save {
-    background: var(--accent);
-    color: #000;
+    background: #1e7e34;
+    color: #fff;
   }
-
-  .btn-save:hover { background: var(--accent-bright); }
 
   .btn-cancel {
-    background: rgba(255,255,255,0.05);
-    color: var(--muted);
+    background: #fff;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
   }
 
-  /* Toast notification fixes */
+  /* Toast Notification */
   .toast {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 15px 25px;
-    border-radius: 10px;
-    z-index: 1000;
+    bottom: 30px;
+    right: 30px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    background: var(--text-main);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 2000;
     display: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   }
-  .toast.show { display: block; animation: slideIn 0.3s forwards; }
-  .toast-success { background: #1b4332; color: #74c69d; border: 1px solid #2d6a4f; }
-  .toast-error { background: #431b1b; color: #c67474; border: 1px solid #6a2d2d; }
+  .toast.show { display: block; animation: slideUp 0.3s ease-out; }
 
-  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-  /* Responsive */
-  @media (max-width: 600px) {
+  @media (max-width: 650px) {
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: auto; }
+    .profile-card { padding: 30px 20px; }
   }
 </style>
 
@@ -194,39 +192,39 @@
     
     <div class="profile-header">
       <div class="avatar-circle" id="avatarIcon">✦</div>
-      <h1 class="profile-title" id="headerName">Profile Settings</h1>
-      <p class="profile-subtitle" id="profileSubtitle">View and update your professional details</p>
+      <h1 class="profile-title" id="headerName">Profile</h1>
+      <p class="profile-subtitle" id="profileSubtitle">Professional identity and contact details</p>
     </div>
 
     <div class="form-grid">
       <div class="input-group full-width">
-        <label>Full Name</label>
+        <label>Display Name</label>
         <input type="text" id="name" class="form-control" placeholder="Not set" disabled>
       </div>
 
       <div class="input-group">
-        <label>Industry / Niche</label>
-        <input type="text" id="industry" class="form-control" placeholder="e.g. Fashion" disabled>
+        <label>Primary Niche</label>
+        <input type="text" id="industry" class="form-control" placeholder="e.g. Lifestyle" disabled>
       </div>
 
       <div class="input-group">
-        <label>Website</label>
+        <label>Website / Portfolio</label>
         <input type="text" id="website" class="form-control" placeholder="yoursite.com" disabled>
       </div>
 
       <div class="input-group full-width">
-        <label>Short Bio</label>
-        <textarea id="bio" class="form-control" placeholder="Write something about yourself..." disabled></textarea>
+        <label>About / Bio</label>
+        <textarea id="bio" class="form-control" placeholder="Describe your creative journey..." disabled></textarea>
       </div>
 
       <div class="input-group">
-        <label>Instagram</label>
+        <label>Instagram Handle</label>
         <input type="text" id="instagram" class="form-control" placeholder="@username" disabled>
       </div>
 
       <div class="input-group">
-        <label>YouTube</label>
-        <input type="text" id="youtube" class="form-control" placeholder="Channel Link" disabled>
+        <label>YouTube Channel</label>
+        <input type="text" id="youtube" class="form-control" placeholder="Link to channel" disabled>
       </div>
     </div>
 
@@ -243,10 +241,10 @@
   const urlParams = new URLSearchParams(window.location.search);
   const targetUserId = urlParams.get('user_id');
 
-  function showToast(msg, type = "success") {
+  function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = `toast toast-${type} show`;
+    t.className = "toast show";
     setTimeout(() => t.classList.remove("show"), 3000);
   }
 
@@ -268,7 +266,7 @@
       btnRow.innerHTML = `<button class="btn btn-edit" onclick="enableEdit()">Edit Profile</button>`;
     } else {
       btnRow.innerHTML = ``; 
-      document.getElementById("profileSubtitle").textContent = "Public Profile View";
+      document.getElementById("profileSubtitle").textContent = "Public View";
     }
   }
 
@@ -281,7 +279,7 @@
     })
     .then(res => res.json())
     .then(data => fillFields(data))
-    .catch(err => showToast("Error loading profile", "error"));
+    .catch(err => showToast("Error loading profile"));
   }
 
   loadProfile();
@@ -290,7 +288,7 @@
     document.querySelectorAll(".form-control").forEach(el => el.disabled = false);
     document.getElementById("btnRow").innerHTML = `
       <button class="btn btn-cancel" onclick="cancelEdit()">Cancel</button>
-      <button class="btn btn-save" onclick="saveProfile()">Save Changes</button>
+      <button class="btn btn-save" onclick="saveProfile()">Update Profile</button>
     `;
   }
 
@@ -319,10 +317,10 @@
     })
     .then(res => res.json())
     .then(() => {
-      showToast("Profile Updated!");
+      showToast("Profile updated successfully");
       cancelEdit();
     })
-    .catch(() => showToast("Update Failed", "error"));
+    .catch(() => showToast("Failed to save profile"));
   }
 </script>
 {% endblock %}
