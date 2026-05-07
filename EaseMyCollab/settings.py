@@ -98,9 +98,9 @@ EMAIL_TIMEOUT = 10
 STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
     "staticfiles": {
