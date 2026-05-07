@@ -92,10 +92,12 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
 EMAIL_HOST_PASSWORD = 'dwrk uioj thel gtzy' # Pakka check karna ye App Password hai
-
+EMAIL_TIMEOUT = 10
 # 9. STATIC & MEDIA FILES
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# settings.py mein ye update karo
+STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

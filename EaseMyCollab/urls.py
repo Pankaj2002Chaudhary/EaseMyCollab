@@ -137,3 +137,8 @@ urlpatterns = [
     path('dashboard/', brand_dashboard),
     path('influencer/dashboard/', influencer_dashboard), # Naya Route
 ]
+from django.conf import settings
+from django.conf.urls.static import static
+
+# Ye line local aur production dono ke liye safety net hai
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
