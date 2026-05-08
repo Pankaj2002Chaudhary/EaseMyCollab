@@ -18,7 +18,6 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
-  /* Profile Header / Banner Area */
   .profile-hero {
     max-width: 900px;
     margin: 0 auto 40px;
@@ -37,7 +36,7 @@
     width: 100%;
     height: 100%;
     background: var(--accent-dark);
-    border-radius: 35% 65% 70% 30% / 30% 40% 60% 70%; /* Organic Shape */
+    border-radius: 35% 65% 70% 30% / 30% 40% 60% 70%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,11 +45,6 @@
     font-family: 'Playfair Display', serif;
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     transition: 0.5s ease;
-  }
-
-  .avatar-stack:hover .avatar-main {
-    border-radius: 50%;
-    transform: rotate(5deg);
   }
 
   .profile-name {
@@ -70,7 +64,6 @@
     margin-top: 10px;
   }
 
-  /* Main Card Grid */
   .profile-grid {
     max-width: 900px;
     margin: 0 auto;
@@ -97,17 +90,8 @@
     display: block;
   }
 
-  .form-group {
-    margin-bottom: 30px;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--accent-dark);
-  }
+  .form-group { margin-bottom: 30px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--accent-dark); }
 
   .custom-input {
     width: 100%;
@@ -118,21 +102,10 @@
     font-size: 16px;
     color: var(--accent-dark);
     transition: 0.3s;
-    border-radius: 0;
   }
 
-  .custom-input:focus {
-    outline: none;
-    border-color: var(--soft-gold);
-  }
+  .custom-input:focus { outline: none; border-color: var(--soft-gold); }
 
-  .custom-input:disabled {
-    border-bottom-color: transparent;
-    font-weight: 500;
-    color: #444;
-  }
-
-  /* Social Icons */
   .social-box {
     display: flex;
     align-items: center;
@@ -144,16 +117,7 @@
     border: 1px solid #f0ede8;
   }
 
-  .social-icon {
-    width: 32px;
-    height: 32px;
-    background: #fcfaf7;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-  }
+  .social-icon { width: 32px; height: 32px; background: #fcfaf7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
 
   /* Buttons */
   .btn-float {
@@ -165,26 +129,23 @@
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     transition: 0.3s;
   }
 
-  .btn-float:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-  }
+  .btn-float:hover { transform: translateY(-3px); }
+  .btn-cancel { background: transparent; color: #888; border: 1px solid #e5e0d8; margin-right: 10px; }
 
-  .btn-cancel {
-    background: transparent;
-    color: #888;
-    border: 1px solid #e5e0d8;
-    margin-right: 10px;
+  /* Reviews Styling */
+  .reviews-section { margin-top: 40px; border-top: 1px solid #e5e0d8; padding-top: 30px; }
+  .review-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #f0ede8;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
   }
-
-  @media (max-width: 800px) {
-    .profile-grid { grid-template-columns: 1fr; }
-    .avatar-main { width: 90px; height: 90px; }
-  }
+  .star-rating { color: var(--soft-gold); margin-bottom: 8px; font-size: 14px; }
 </style>
 
 <div class="profile-wrapper">
@@ -194,22 +155,22 @@
     </div>
     <h1 class="profile-name" id="headerName">Profile Settings</h1>
     <div class="profile-tagline" id="profileSubtitle">InfluSync Verified Creator</div>
+    <div id="ratingBadge" style="margin-top:15px; font-weight:bold; color:var(--accent-dark);">
+        <span id="avgStars"></span> (<span id="avgValue">0</span>/5)
+    </div>
   </div>
 
   <div class="profile-grid">
     <div class="side-info">
       <span class="info-label">Connected Socials</span>
-      
       <div class="social-box">
         <div class="social-icon">IG</div>
         <input type="text" id="instagram" class="custom-input" placeholder="@handle" disabled>
       </div>
-
       <div class="social-box">
         <div class="social-icon">YT</div>
         <input type="text" id="youtube" class="custom-input" placeholder="Channel" disabled>
       </div>
-
       <div style="margin-top: 40px;">
         <span class="info-label">Personal Site</span>
         <input type="text" id="website" class="custom-input" placeholder="yoursite.com" disabled>
@@ -221,24 +182,27 @@
         <label>Full Name</label>
         <input type="text" id="name" class="custom-input" placeholder="Your Name" disabled>
       </div>
-
       <div class="form-group">
         <label>Niche / Category</label>
         <input type="text" id="industry" class="custom-input" placeholder="Fashion, Tech, etc." disabled>
       </div>
-
       <div class="form-group">
         <label>About Me</label>
-        <textarea id="bio" class="custom-input" style="min-height: 100px; border-bottom: 1px solid #e5e0d8;" placeholder="Tell your story..." disabled></textarea>
+        <textarea id="bio" class="custom-input" style="min-height: 100px;" placeholder="Tell your story..." disabled></textarea>
       </div>
 
-      <div id="btnRow" style="text-align: right; margin-top: 20px;">
-        </div>
+      <div id="btnRow" style="text-align: right; margin-top: 20px;"></div>
+
+      <div class="reviews-section">
+        <span class="info-label">Ratings & Feedback</span>
+        <div id="reviewsContainer">
+            </div>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="toast" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1a1a1a; color:#fff; padding:12px 30px; border-radius:50px; font-size:14px; display:none; z-index:1000; box-shadow:0 10px 30px rgba(0,0,0,0.2);"></div>
+<div id="toast" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1a1a1a; color:#fff; padding:12px 30px; border-radius:50px; font-size:14px; display:none; z-index:1000;"></div>
 
 <script>
   const token = localStorage.getItem("token");
@@ -250,6 +214,25 @@
     t.textContent = msg;
     t.style.display = "block";
     setTimeout(() => t.style.display = "none", 3000);
+  }
+
+  function renderReviews(data) {
+      const container = document.getElementById("reviewsContainer");
+      const avgValue = data.average_rating || 0;
+      document.getElementById("avgValue").textContent = avgValue;
+      document.getElementById("avgStars").textContent = "★".repeat(Math.round(avgValue)) + "☆".repeat(5 - Math.round(avgValue));
+
+      if (data.reviews && data.reviews.length > 0) {
+          container.innerHTML = data.reviews.map(rev => `
+              <div class="review-card">
+                  <div class="star-rating">${"★".repeat(rev.rating)}${"☆".repeat(5-rev.rating)}</div>
+                  <p style="font-size: 14px; color: #444; margin: 0;">"${rev.comment || 'No comment'}"</p>
+                  <small style="color: #999; display: block; margin-top: 10px;">— ${rev.reviewer_name}</small>
+              </div>
+          `).join('');
+      } else {
+          container.innerHTML = `<p style="color:#999; font-size:14px;">No reviews yet.</p>`;
+      }
   }
 
   function fillFields(data) {
@@ -266,8 +249,10 @@
     }
 
     const btnRow = document.getElementById("btnRow");
+    // is_owner logic checks if the profile belongs to the logged-in user
     if (data.is_owner) {
       btnRow.innerHTML = `<button class="btn-float" onclick="enableEdit()">Edit Details</button>`;
+      document.getElementById("profileSubtitle").textContent = "Your Settings";
     } else {
       btnRow.innerHTML = ``; 
       document.getElementById("profileSubtitle").textContent = "Public Profile";
@@ -282,11 +267,12 @@
       headers: { "Authorization": "Bearer " + token }
     })
     .then(res => res.json())
-    .then(data => fillFields(data))
+    .then(data => {
+        fillFields(data);
+        renderReviews(data);
+    })
     .catch(err => showToast("Error loading profile"));
   }
-
-  loadProfile();
 
   function enableEdit() {
     document.querySelectorAll(".custom-input").forEach(el => el.disabled = false);
@@ -326,5 +312,7 @@
     })
     .catch(() => showToast("Failed to save profile"));
   }
+
+  loadProfile();
 </script>
 {% endblock %}

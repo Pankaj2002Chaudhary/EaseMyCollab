@@ -94,6 +94,7 @@ from collaborations.views import AcceptApplicationView
 from campaigns.views_frontend import create_campaign_page
 from accounts.views_frontend import profile_page, login_page, home_page, register_page
 from accounts.views import RegisterView, ForgotPasswordView, ResetPasswordView
+from collaborations.views import SubmitReviewView
 # Frontend Views (Jinhe alag file me nahi dala unhe yahi define kar rahe hain)
 def brand_dashboard(request):
     return render(request, 'brand/dashboard.html')
@@ -107,6 +108,7 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view()),
     path('api/login/', LoginView.as_view(), name='login'),
     # path('api/send-otp/', SendOTPView.as_view(), name='send-otp'),
+    path('submit-review/', SubmitReviewView.as_view(), name='submit-review'),
     
     # Forgot Password Flow
     path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
