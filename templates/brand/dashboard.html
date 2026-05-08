@@ -6,12 +6,12 @@
 
 <style>
   :root {
-    --bg-color: #fcfaf7;       /* Soft Beige */
+    --bg-color: #fcfaf7;
     --card-bg: #ffffff;
-    --text-main: #1a1a1a;     /* Deep Black */
+    --text-main: #1a1a1a;
     --text-muted: #666666;
-    --accent: #1a1a1a;        /* Solid Black Buttons */
-    --border: #e5e0d8;        /* Beige border */
+    --accent: #1a1a1a;
+    --border: #e5e0d8;
     --success: #166534;
     --danger: #991b1b;
   }
@@ -80,11 +80,7 @@
     border-color: #d1cbc1;
   }
 
-  .campaign-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
+  .campaign-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
 
   .campaign-desc {
     font-size: 14px;
@@ -93,7 +89,6 @@
     margin-bottom: 20px;
   }
 
-  /* APPLICANTS SECTION */
   .applicant-item {
     padding: 14px;
     background: #fafafa;
@@ -114,30 +109,6 @@
     background: #eee;
   }
 
-  /* MODAL */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(26, 26, 26, 0.4);
-    backdrop-filter: blur(4px); z-index: 1000;
-  }
-
-  #reviewModal {
-    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 40px; border-radius: 20px;
-    z-index: 1001; width: 90%; max-width: 400px;
-    border: 1px solid var(--border);
-  }
-
-  .review-input {
-    width: 100%; border: 1px solid var(--border); padding: 12px;
-    margin: 10px 0 20px; border-radius: 8px; font-family: inherit; font-size: 14px;
-  }
-
-  .btn-submit-rev {
-    background: var(--accent); color: white; border: none;
-    padding: 14px; border-radius: 8px; font-weight: 600; width: 100%; cursor: pointer;
-  }
-
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
@@ -152,52 +123,9 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="overlay" onclick="closeReviewModal()"></div>
-<div id="reviewModal">
-    <h3 style="font-family: 'Playfair Display'; font-size: 24px; margin-bottom: 8px;">Rate Collaboration</h3>
-    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Share your experience with the influencer.</p>
-    
-    <label style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Rating (1-5)</label>
-    <input type="number" id="ratingScore" class="review-input" min="1" max="5" value="5">
-    
-    <label style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Feedback</label>
-    <textarea id="reviewComment" class="review-input" rows="3" placeholder="Describe the collaboration..."></textarea>
-    
-    <button onclick="submitReview()" class="btn-submit-rev">Submit Review</button>
-    <button onclick="closeReviewModal()" style="background:transparent; border:none; color:var(--text-muted); width:100%; margin-top:16px; cursor:pointer; font-size: 13px;">Dismiss</button>
-</div>
-
 <script>
 let openedCampaign = null;
-let activeAppId = null;
 const token = localStorage.getItem("token");
-
-function openReviewModal(appId, event) {
-    if(event) event.stopPropagation();
-    activeAppId = appId;
-    document.getElementById('reviewModal').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
-
-function closeReviewModal() {
-    document.getElementById('reviewModal').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
-async function submitReview() {
-    const rating = document.getElementById('ratingScore').value;
-    const comment = document.getElementById('reviewComment').value;
-    if (rating < 1 || rating > 5) { alert("Invalid rating"); return; }
-
-    try {
-        const res = await fetch(`https://easemycollab.onrender.com/api/post-review/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ application_id: activeAppId, rating, comment })
-        });
-        if (res.ok) { location.reload(); }
-    } catch (err) { alert("Error connecting to server."); }
-}
 
 async function updateStatus(appId, newStatus, event) {
     if (event) event.stopPropagation();
@@ -237,7 +165,6 @@ async function toggleApplicants(campaignId) {
                             <button onclick="updateStatus(${app.id}, 'rejected', event)" style="background:#991b1b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">Reject</button>
                         ` : `
                             <span class="status-tag">${app.status}</span>
-                            ${app.status === 'accepted' ? `<button onclick="openReviewModal(${app.id}, event)" style="background:var(--accent); color:white; border:none; padding:6px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-left:8px;">Rate</button>` : ''}
                         `}
                     </div>
                 </div>

@@ -119,7 +119,6 @@
 
   .social-icon { width: 32px; height: 32px; background: #fcfaf7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
 
-  /* Buttons */
   .btn-float {
     background: var(--accent-dark);
     color: #fff;
@@ -134,18 +133,6 @@
 
   .btn-float:hover { transform: translateY(-3px); }
   .btn-cancel { background: transparent; color: #888; border: 1px solid #e5e0d8; margin-right: 10px; }
-
-  /* Reviews Styling */
-  .reviews-section { margin-top: 40px; border-top: 1px solid #e5e0d8; padding-top: 30px; }
-  .review-card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #f0ede8;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-  }
-  .star-rating { color: var(--soft-gold); margin-bottom: 8px; font-size: 14px; }
 </style>
 
 <div class="profile-wrapper">
@@ -155,9 +142,6 @@
     </div>
     <h1 class="profile-name" id="headerName">Profile Settings</h1>
     <div class="profile-tagline" id="profileSubtitle">InfluSync Verified Creator</div>
-    <div id="ratingBadge" style="margin-top:15px; font-weight:bold; color:var(--accent-dark);">
-        <span id="avgStars"></span> (<span id="avgValue">0</span>/5)
-    </div>
   </div>
 
   <div class="profile-grid">
@@ -192,12 +176,6 @@
       </div>
 
       <div id="btnRow" style="text-align: right; margin-top: 20px;"></div>
-
-      <div class="reviews-section">
-        <span class="info-label">Ratings & Feedback</span>
-        <div id="reviewsContainer">
-            </div>
-      </div>
     </div>
   </div>
 </div>
@@ -216,25 +194,6 @@
     setTimeout(() => t.style.display = "none", 3000);
   }
 
-  function renderReviews(data) {
-      const container = document.getElementById("reviewsContainer");
-      const avgValue = data.average_rating || 0;
-      document.getElementById("avgValue").textContent = avgValue;
-      document.getElementById("avgStars").textContent = "★".repeat(Math.round(avgValue)) + "☆".repeat(5 - Math.round(avgValue));
-
-      if (data.reviews && data.reviews.length > 0) {
-          container.innerHTML = data.reviews.map(rev => `
-              <div class="review-card">
-                  <div class="star-rating">${"★".repeat(rev.rating)}${"☆".repeat(5-rev.rating)}</div>
-                  <p style="font-size: 14px; color: #444; margin: 0;">"${rev.comment || 'No comment'}"</p>
-                  <small style="color: #999; display: block; margin-top: 10px;">— ${rev.reviewer_name}</small>
-              </div>
-          `).join('');
-      } else {
-          container.innerHTML = `<p style="color:#999; font-size:14px;">No reviews yet.</p>`;
-      }
-  }
-
   function fillFields(data) {
     document.getElementById("name").value = data.name || "";
     document.getElementById("industry").value = data.industry || "";
@@ -249,7 +208,6 @@
     }
 
     const btnRow = document.getElementById("btnRow");
-    // is_owner logic checks if the profile belongs to the logged-in user
     if (data.is_owner) {
       btnRow.innerHTML = `<button class="btn-float" onclick="enableEdit()">Edit Details</button>`;
       document.getElementById("profileSubtitle").textContent = "Your Settings";
@@ -267,10 +225,7 @@
       headers: { "Authorization": "Bearer " + token }
     })
     .then(res => res.json())
-    .then(data => {
-        fillFields(data);
-        renderReviews(data);
-    })
+    .then(data => fillFields(data))
     .catch(err => showToast("Error loading profile"));
   }
 
