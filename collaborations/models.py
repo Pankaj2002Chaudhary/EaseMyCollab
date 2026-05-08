@@ -13,7 +13,7 @@ class Collaboration(models.Model):
     started_at = models.DateTimeField(auto_now_add=True)
 
 class Review(models.Model):
-    campaign = models.ForeignKey('campaigns.Campaign', on_row=models.CASCADE)
+    campaign = models.ForeignKey('campaigns.Campaign', on_delete=models.CASCADE)
     reviewer = models.ForeignKey(User, on_row=models.CASCADE, related_name='reviews_given')
     target_user = models.ForeignKey(User, on_row=models.CASCADE, related_name='reviews_received')
     rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
