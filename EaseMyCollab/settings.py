@@ -7,8 +7,7 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 2. SECURITY
-SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-only-for-local')
-
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ms=4q@pnu%=d53*rm=kdtt8+1@@_%v&lys+f*1##g7=env_@zr')
 # Render par DEBUG False hona chahiye, par abhi testing ke liye True rakha hai
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
