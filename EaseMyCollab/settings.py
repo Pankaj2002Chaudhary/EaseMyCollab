@@ -7,7 +7,7 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 2. SECURITY
-SECRET_KEY = 'django-insecure-ms=4q@pnu%=d53*rm=kdtt8+1@@_%v&lys+f*1##g7=env_@zr'
+SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-only-for-local')
 
 # Render par DEBUG False hona chahiye, par abhi testing ke liye True rakha hai
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
@@ -92,21 +92,28 @@ CACHES = {
     }
 }
 # 8. EMAIL SETTINGS (OTP Feature)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
-EMAIL_HOST_PASSWORD = 'vmww mqzx wkbh qqdx' # Pakka check karna ye App Password hai
-# 9. STATIC & MEDIA FILES
-# settings.py mein ye update karo
-STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+# EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
+# EMAIL_HOST_PASSWORD = 'vmww mqzx wkbh qqdx' # Pakka check karna ye App Password hai
+# # 9. STATIC & MEDIA FILES
+# # settings.py mein ye update karo
+# STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = BASE_DIR / 'media'
-
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  # literally the string "apikey"
+EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@email.com'
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
