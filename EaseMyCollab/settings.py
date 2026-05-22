@@ -99,12 +99,12 @@ CACHES = {
 # EMAIL_HOST_PASSWORD = 'vmww mqzx wkbh qqdx' # Pakka check karna ye App Password hai
 # # 9. STATIC & MEDIA FILES
 # # settings.py mein ye update karo
-# STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
