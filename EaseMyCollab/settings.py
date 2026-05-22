@@ -92,12 +92,8 @@ CACHES = {
 }
 
 # 9. EMAIL SETTINGS (SendGrid Official Web API Backend)
-EEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+# EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'  # Not used anymore
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
 
 # 10. STATIC & MEDIA FILES CONFIG (Fixes 'Empty static prefix' Crash)

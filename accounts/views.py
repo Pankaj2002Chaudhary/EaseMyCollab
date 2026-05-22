@@ -1,82 +1,48 @@
+import os
+import random
+import sendgrid
+from sendgrid.helpers.mail import Mail
+
+from django.conf import settings
+from django.core.cache import cache
+from django.contrib.auth import authenticate, get_user_model
+from django.shortcuts import get_object_or_404
+from django.db.models import Avg
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RegisterSerializer
-
-# class RegisterView(APIView):
-
-#     def post(self, request):
-#         serializer = RegisterSerializer(data=request.data)
-
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({"message": "User registered successfully"})
-
-#         return Response(serializer.errors)
-    
-
-# import random
-# from django.core.mail import send_mail
-# from django.core.cache import cache
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from django.contrib.auth import get_user_model
-
-# User = get_user_model()
-
-# import random
-
-# from django.conf import settings
-# from django.core.cache import cache
-# from django.core.mail import send_mail
-
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-
-# from .models import User
-
-
-# class SendOTPView(APIView):
-#     def post(self, request):
-#         email = request.data.get('email', '').strip().lower()
-#         username = request.data.get('username', '').strip()
-
-#         if User.objects.filter(email=email).exists():
-#             return Response(
-#                 {"error": "Bhai, ye email pehle se registered hai!"},
-#                 status=400
-#             )
-
-#         if User.objects.filter(username=username).exists():
-#             return Response(
-#                 {"error": "Ye username koi le chuka hai!"},
-#                 status=400
-#             )
-
-#         otp = str(random.randint(100000, 999999))
-
-#         cache.set(f'otp_{email}', otp, timeout=300)
-
-#         try:
-#             send_mail(
-#                 'Verify EaseMyCollab Account',
-#                 f'Aapka registration OTP hai: {otp}',
-#                 settings.EMAIL_HOST_USER,
-#                 [email],
-#                 fail_silently=False,
-#             )
-
-#             return Response({"message": "OTP Sent, Please Check!"})
-
-#         except Exception as e:
-#             return Response(
-#                 {"error": str(e)},
-#                 status=500
-#             )
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 
+from .serializers import RegisterSerializer, LoginSerializer
+from .models import User
+from brands.models import BrandProfile
+from influencers.models import InfluencerProfile
+from campaigns.models import Review
+
+User = get_user_model()
+
+
+# ─────────────────────────────────────────────
+# HELPER: Send email via SendGrid HTTP API
+# (No SMTP — works on Render free tier)
+# ─────────────────────────────────────────────
+def send_otp_email(to_email, subject, body):
+    sg = sendgrid.SendGridAPIClient(api_key=os.getenv('SENDGRID_API_KEY'))
+    message = Mail(
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_emails=to_email,
+        subject=subject,
+        plain_text_content=body
+    )
+    response = sg.client.mail.send.post(request_body=message.get())
+    return response.status_code
+
+
+# ─────────────────────────────────────────────
+# REGISTER (Direct, no OTP — legacy)
+# ─────────────────────────────────────────────
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
@@ -85,14 +51,12 @@ class RegisterView(APIView):
         password = data.get('password')
         role = data.get('role', 'influencer')
 
-        # Check if user already exists
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already taken'}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(email=email).exists():
             return Response({'error': 'Email already registered'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Direct User Creation (No OTP)
             user = User.objects.create_user(
                 username=username,
                 email=email,
@@ -104,26 +68,23 @@ class RegisterView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
+# ─────────────────────────────────────────────
+# LOGIN
+# ─────────────────────────────────────────────
 class LoginView(APIView):
-    """Secure clean login API providing validation tokens for EaseMyCollab"""
     def post(self, request):
         username = request.data.get('username', '').strip()
         password = request.data.get('password', '')
 
         if not username or not password:
-            return Response({"detail": "Please provide both username and password."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Please provide both username and password."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # Django authenticate uses password hashing systems automatically
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             return Response({
                 "access": str(refresh.access_token),
@@ -137,42 +98,28 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-    
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from brands.models import BrandProfile
-from influencers.models import InfluencerProfile
-from django.shortcuts import get_object_or_404
-from rest_framework import status
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
-from django.db.models import Avg
-from campaigns.models import Review # Import check kar lena sahi hai na
-
+# ─────────────────────────────────────────────
+# PROFILE
+# ─────────────────────────────────────────────
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user_id = request.query_params.get('user_id')
-        
-        # Decide target user
+
         if user_id:
             target_user = get_object_or_404(User, id=user_id)
         else:
             target_user = request.user
 
-        # Is current user viewing their own profile?
         is_owner = (target_user == request.user)
 
-        # Rating Logic with Error Safety
         try:
             reviews_received = Review.objects.filter(reviewee=target_user)
             avg_rating = reviews_received.aggregate(Avg('rating'))['rating__avg'] or 0
             total_reviews = reviews_received.count()
-            
             latest_reviews = []
             for r in reviews_received.order_by('-created_at')[:5]:
                 latest_reviews.append({
@@ -182,7 +129,6 @@ class ProfileView(APIView):
                     "date": r.created_at.strftime("%d %b %Y")
                 })
         except Exception:
-            # Agar Review table nahi bani toh crash na ho
             avg_rating, total_reviews, latest_reviews = 0, 0, []
 
         if target_user.role == "brand":
@@ -190,7 +136,7 @@ class ProfileView(APIView):
             data = {
                 "id": target_user.id,
                 "role": "brand",
-                "is_owner": is_owner, # Ye True hoga toh Edit button aayega
+                "is_owner": is_owner,
                 "name": profile.name or target_user.username,
                 "industry": profile.industry,
                 "website": profile.website,
@@ -240,22 +186,12 @@ class ProfileView(APIView):
             profile.save()
 
         return Response({"message": "Profile updated successfully"})
-    
-import random
-from django.conf import settings
-from django.core.cache import cache
-from django.core.mail import send_mail
-from django.contrib.auth import get_user_model
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer
 
-User = get_user_model()
 
+# ─────────────────────────────────────────────
+# OTP REGISTRATION — Step 1: Send OTP
+# ─────────────────────────────────────────────
 class SendRegistrationOTPView(APIView):
-    """Step 1: Validate details and send an OTP to email without creating the user yet."""
     def post(self, request):
         email = request.data.get('email', '').strip().lower()
         username = request.data.get('username', '').strip()
@@ -263,7 +199,10 @@ class SendRegistrationOTPView(APIView):
         role = request.data.get('role', 'influencer')
 
         if not email or not username or not password:
-            return Response({"error": "Username, email, and password are required!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Username, email, and password are required!"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if User.objects.filter(email=email).exists():
             return Response({"error": "Bhai, ye email pehle se registered hai!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -271,98 +210,97 @@ class SendRegistrationOTPView(APIView):
         if User.objects.filter(username=username).exists():
             return Response({"error": "Ye username koi le chuka hai!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate 6 digit OTP
         otp = str(random.randint(100000, 999999))
-        
-        # Structure the registration payload to save in cache temporary
-        user_data = {
+
+        cache.set(f'reg_{email}', {
             "username": username,
             "email": email,
             "password": password,
             "role": role,
             "otp": otp
-        }
-        
-        # Save payload in cache for 5 minutes (300 seconds)
-        cache.set(f'reg_{email}', user_data, timeout=300)
+        }, timeout=300)
 
         try:
             print(f"Triggering OTP email toward: {email}")
-            send_mail(
+            send_otp_email(
+                email,
                 'Verify Your EaseMyCollab Account',
-                f'Aapka registration OTP hai: {otp}. It is valid for 5 minutes.',
-                'pankajchoudhary6643@gmail.com',  # settings.EMAIL_HOST_USER ki jagah direct verified email likho
-                [email],
-                fail_silently=False,
+                f'Aapka registration OTP hai: {otp}. It is valid for 5 minutes.'
             )
             return Response({"message": "OTP Sent successfully! Please check your email."}, status=status.HTTP_200_OK)
-            
+
         except Exception as e:
             print(f"CRITICAL EMAIL ERROR: {str(e)}")
             return Response(
                 {"error": "Email sending failed. Please try again."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+# ─────────────────────────────────────────────
+# OTP REGISTRATION — Step 2: Verify OTP
+# ─────────────────────────────────────────────
 class VerifyRegistrationOTPView(APIView):
-    """Step 2: Check OTP from cache. If matched, create the User record in DB."""
     def post(self, request):
         email = request.data.get('email', '').strip().lower()
         otp_received = request.data.get('otp', '').strip()
 
         cached_data = cache.get(f'reg_{email}')
-        
+
         if not cached_data:
-            return Response({"error": "OTP expired ya details invalid hain. Please click resend."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "OTP expired ya details invalid hain. Please click resend."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if cached_data['otp'] != otp_received:
             return Response({"error": "Galat OTP dala hai aapne!"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # OTP matches! Create user now
             user = User.objects.create_user(
                 username=cached_data['username'],
                 email=cached_data['email'],
                 password=cached_data['password'],
                 role=cached_data['role']
             )
-            
-            # Clean cache after successful registration
             cache.delete(f'reg_{email}')
-            
             return Response({"message": "Registration successful! Your account is active."}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# ─────────────────────────────────────────────
+# FORGOT PASSWORD — Step 1: Send OTP
+# ─────────────────────────────────────────────
 class ForgotPasswordView(APIView):
-    """Step 1 for Forgot Password: Check if email exists, cache OTP."""
     def post(self, request):
         email = request.data.get('email', '').strip().lower()
-        
+
         if not User.objects.filter(email=email).exists():
             return Response({"error": "Bhai, ye email registered nahi hai!"}, status=status.HTTP_404_NOT_FOUND)
 
         otp = str(random.randint(100000, 999999))
-        cache.set(f'reset_otp_{email}', otp, timeout=300) # Valid for 5 mins
+        cache.set(f'reset_otp_{email}', otp, timeout=300)
 
         try:
-            send_mail(
+            send_otp_email(
+                email,
                 'Password Reset OTP - EaseMyCollab',
-                f'Aapka password reset OTP hai: {otp}',
-                'pankajchoudhary6643@gmail.com',  # Direct sender authentication mapping
-                [email],
-                fail_silently=False,
+                f'Aapka password reset OTP hai: {otp}. Valid for 5 minutes.'
             )
             return Response({"message": "Password reset OTP bhej diya gaya hai."}, status=status.HTTP_200_OK)
         except Exception as e:
-            print(f"Forgot Password SMTP Error: {str(e)}")
-            return Response({
-                "message": "Reset process simulated due to server port restrictions.",
-                "otp_preview_only_for_dev": otp
-            }, status=status.HTTP_200_OK)
+            print(f"Forgot Password Email Error: {str(e)}")
+            return Response(
+                {"error": "Email sending failed. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
+
+# ─────────────────────────────────────────────
+# FORGOT PASSWORD — Step 2: Reset Password
+# ─────────────────────────────────────────────
 class ResetPasswordView(APIView):
-    """Step 2 for Forgot Password: Match OTP and set new password safely."""
     def post(self, request):
         email = request.data.get('email', '').strip().lower()
         otp_received = request.data.get('otp', '').strip()
@@ -375,12 +313,9 @@ class ResetPasswordView(APIView):
         if not stored_otp or stored_otp != otp_received:
             return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Update Password securely using set_password
         user = User.objects.get(email=email)
         user.set_password(new_password)
         user.save()
 
-        # Evict cache key
         cache.delete(f'reset_otp_{email}')
         return Response({"message": "Password updated successfully!"}, status=status.HTTP_200_OK)
-    
