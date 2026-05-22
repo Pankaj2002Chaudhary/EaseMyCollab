@@ -106,13 +106,21 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 # settings.py
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'  # literally the string "apikey"
-EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+# ==============================================================================
+# 8. EMAIL SETTINGS (SendGrid Official Web API Backend - Rock Solid)
+# ==============================================================================
+# SMTP Backend hata kar official SendGrid API backend use karenge
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+
+# Render Environment Variables se API key read hogi
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+
+# Aapka verified single sender email
 DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
+
+# Toggle sandbox mode (Testing ke liye False rakhein taaki real mail jaye)
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+# DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
