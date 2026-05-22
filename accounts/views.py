@@ -298,16 +298,11 @@ class SendRegistrationOTPView(APIView):
             return Response({"message": "OTP Sent successfully! Please check your email."}, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"CRITICAL SMTP/SENDGRID ERROR BYPASSED: {str(e)}")
-            # FALLBACK LOGIC FOR FRONTEND TESTING:
-            # Agar network socket Render par fail ho jaye, toh flow crash mat karo.
-            # Response mein message badal do taaki aap testing bypass kar sako.
-            return Response({
-                "message": "OTP delivery delayed, but code generated for testing!",
-                "debug_info": "Bhai, testing ke liye use kar lo agar email block hai",
-                "otp_preview_only_for_dev": otp  # Frontend can read this during dev phase if network drops
-            }, status=status.HTTP_200_OK) # Status 200 return hoga toh UI 'Server Connection Failed' nahi dikhaega!
-
+            print(f"CRITICAL EMAIL ERROR: {str(e)}")
+            return Response(
+                {"error": "Email sending failed. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 class VerifyRegistrationOTPView(APIView):
     """Step 2: Check OTP from cache. If matched, create the User record in DB."""
     def post(self, request):
