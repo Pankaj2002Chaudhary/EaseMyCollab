@@ -8,14 +8,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 2. SECURITY
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ms=4q@pnu%=d53*rm=kdtt8+1@@_%v&lys+f*1##g7=env_@zr')
-# Render par DEBUG False hona chahiye, par abhi testing ke liye True rakha hai
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['easemycollab.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
 
 # 3. APPS
 INSTALLED_APPS = [
-    'corsheaders',  # Sabse upar hona chahiye
+    'corsheaders',  # Sabse upar zaroori hai
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,9 +31,9 @@ INSTALLED_APPS = [
 
 # 4. MIDDLEWARE
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # Ye sabse upar zaroori hai
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Static files ke liye
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Static files compression & caching ke liye
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,7 +42,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# 5. CORS SETTINGS (OTP issue solve karne ke liye)
+# 5. CORS SETTINGS
 CORS_ALLOWED_ORIGINS = [
     "https://easemycollab.onrender.com",
     "http://127.0.0.1:8000",
@@ -83,44 +82,31 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-# Caching Configuration (LocMemCache works out of the box without Redis setup)
+
+# 8. CACHING CONFIGURATION (OTP Storage)
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake-easemycollab',
     }
 }
-# 8. EMAIL SETTINGS (OTP Feature)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 465
-# EMAIL_USE_SSL = True
-# EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
-# EMAIL_HOST_PASSWORD = 'vmww mqzx wkbh qqdx' # Pakka check karna ye App Password hai
-# # 9. STATIC & MEDIA FILES
-# # settings.py mein ye update karo
-STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Agar aapki CSS 'static' folder mein hai
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-# settings.py
-# ==============================================================================
-# 8. EMAIL SETTINGS (SendGrid Official Web API Backend - Rock Solid)
-# ==============================================================================
-# SMTP Backend hata kar official SendGrid API backend use karenge
+
+# 9. EMAIL SETTINGS (SendGrid Official Web API Backend)
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-
-# Render Environment Variables se API key read hogi
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-
-# Aapka verified single sender email
 DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
-
-# Toggle sandbox mode (Testing ke liye False rakhein taaki real mail jaye)
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-# DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
+
+# 10. STATIC & MEDIA FILES CONFIG (Fixes 'Empty static prefix' Crash)
+STATIC_URL = 'static/'  # Standard modern relative path prefix
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Kisi empty pattern fallback se bachne ke liye safe setup
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Django 4.2+ ke standard dictionary backend storage rules
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -130,7 +116,10 @@ STORAGES = {
     },
 }
 
-# 10. TEMPLATES
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# 11. TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -147,15 +136,7 @@ TEMPLATES = [
     },
 ]
 
-# 11. CACHE (OTP storage ke liye)
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
-}
-
-# OTHER SETTINGS
+# 12. OTHER CORE SETTINGS
 ROOT_URLCONF = 'EaseMyCollab.urls'
 WSGI_APPLICATION = 'EaseMyCollab.wsgi.application'
 LANGUAGE_CODE = 'en-us'
