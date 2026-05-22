@@ -11,3 +11,8 @@ def home_page(request):
 
 def profile_page(request):
     return render(request, 'profile.html')
+from django.shortcuts import render
+
+def forgot_password_page(request):
+    """Browser par Forgot Password ka HTML page render karne ke liye"""
+    return render(request, 'auth/forget_password.html')

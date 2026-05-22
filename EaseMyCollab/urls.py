@@ -1,84 +1,18 @@
-"""
-URL configuration for EaseMyCollab project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-# from django.contrib import admin
-# from django.urls import path
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-# ]
-# from django.urls import path
-# from accounts.views import RegisterView
-# from campaigns.views import (
-#     CreateCampaignView,
-#     CampaignListView,
-#     ApplyCampaignView,
-#     ViewApplicantsView,
-#     MyCampaignsAPI,
-#     DeleteCampaignAPI,
-#     InfluencerApplicationsView,
-# )
-# from collaborations.views import AcceptApplicationView
-# from accounts.views import LoginView
-# from campaigns.views_frontend import create_campaign_page
-# from accounts.views_frontend import profile_page, login_page,home_page, register_page
-# from django.shortcuts import render
-# from brands.views import BrandProfileView
-# from influencers.views import InfluencerProfileView
-# from accounts.views import ProfileView
-# from django.contrib import admin
-# def brand_dashboard(request):
-#     return render(request, 'brand/dashboard.html')
-
-# urlpatterns = [
-#     path('api/register/', RegisterView.as_view()),
-#     path('admin/', admin.site.urls),
-#     path('api/campaigns/', CampaignListView.as_view()),
-#     path('api/create-campaign/', CreateCampaignView.as_view()),
-
-#     path('apply/<int:campaign_id>/', ApplyCampaignView.as_view()),
-#     path('api/applicants/<int:campaign_id>/', ViewApplicantsView.as_view()),
-
-#     path('accept/<int:application_id>/', AcceptApplicationView.as_view()),
-#     path('api/login/', LoginView.as_view(), name='login'),
-#     path('api/my-campaigns/', MyCampaignsAPI.as_view()),
-#     path('delete-campaign/<int:id>/', DeleteCampaignAPI.as_view()),
-#     # path('api/brand-profile/', BrandProfileView.as_view()),
-#     # path('api/influencer-profile/', InfluencerProfileView.as_view()),
-#     path('api/profile/', ProfileView.as_view()),
-#     # campaigns/urls.py
-#     path('api/influencer/my-applications/', InfluencerApplicationsView.as_view()),
-
-#     # influencers/urls.py (ya jahan bhi profile view hai)
-#     # path('api/profile/', InfluencerProfileView.as_view()),
-
-#     path('login/', login_page),
-#     path('register/', register_page),
-#     path('',home_page, name='home'),
-#     path('create-campaign/', create_campaign_page),
-#     path('dashboard/', brand_dashboard),
-#     path('profile/', profile_page),
-
-# ]
-
-
 from django.urls import path
 from django.contrib import admin
 from django.shortcuts import render
-from accounts.views import RegisterView, LoginView, ProfileView
+from django.conf import settings
+from django.conf.urls.static import static
+
+# --- Backend API Views ---
+from accounts.views import (
+    SendRegistrationOTPView,
+    VerifyRegistrationOTPView,
+    ForgotPasswordView,
+    ResetPasswordView,
+    LoginView,
+    ProfileView
+)
 from campaigns.views import (
     CreateCampaignView,
     CampaignListView,
@@ -91,56 +25,57 @@ from campaigns.views import (
     PostReviewView,
 )
 from collaborations.views import AcceptApplicationView
+
+# --- Frontend HTML Views ---
 from campaigns.views_frontend import create_campaign_page
 from accounts.views_frontend import profile_page, login_page, home_page, register_page
-from accounts.views import RegisterView, ForgotPasswordView, ResetPasswordView
-# from collaborations.views import SubmitReviewView
-# Frontend Views (Jinhe alag file me nahi dala unhe yahi define kar rahe hain)
+
+# Local Frontend Views
 def brand_dashboard(request):
     return render(request, 'brand/dashboard.html')
 
 def influencer_dashboard(request):
-    return render(request, 'influencer/dashboard.html') # Naya Template
-
+    return render(request, 'influencer/dashboard.html')
+from accounts import views_frontend
+# --- URL Patterns ---
 urlpatterns = [
-    # --- Auth & Admin ---
+    # Admin Panel
     path('admin/', admin.site.urls),
-    path('api/register/', RegisterView.as_view()),
-    path('api/login/', LoginView.as_view(), name='login'),
-    # path('api/send-otp/', SendOTPView.as_view(), name='send-otp'),
-    # path('submit-review/', SubmitReviewView.as_view(), name='submit-review'),
     
-    # Forgot Password Flow
-    path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
-    path('api/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+    # --- Authentication API ---
+    path('api/register/send-otp/', SendRegistrationOTPView.as_view(), name='register_send_otp'),
+    path('api/register/verify-otp/', VerifyRegistrationOTPView.as_view(), name='register_verify_otp'),
+    path('api/login/', LoginView.as_view(), name='login_api'),
+    path('forgot-password/', views_frontend.forgot_password_page, name='forgot_password_page'),
+    path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot_password_api'),
+    path('api/reset-password/', ResetPasswordView.as_view(), name='reset_password_api'),
     
-    # --- API Endpoints ---
+    # --- Campaigns API ---
     path('api/campaigns/', CampaignListView.as_view()),
     path('api/create-campaign/', CreateCampaignView.as_view()),
     path('api/my-campaigns/', MyCampaignsAPI.as_view()),
     path('api/delete-campaign/<int:id>/', DeleteCampaignAPI.as_view()),
     
-    # --- Applications & Dashboard API ---
-    path('api/apply/<int:campaign_id>/', ApplyCampaignView.as_view()), # API prefix add kiya safety ke liye
+    # --- Applications, Reviews & Profiles API ---
+    path('api/apply/<int:campaign_id>/', ApplyCampaignView.as_view()), 
     path('api/applicants/<int:campaign_id>/', ViewApplicantsView.as_view()),
     path('api/accept-application/<int:application_id>/', AcceptApplicationView.as_view()),
     path('api/influencer/my-applications/', InfluencerApplicationsView.as_view()),
-    path('api/profile/', ProfileView.as_view()), # Common Profile API
+    path('api/profile/', ProfileView.as_view(), name='profile_api'), 
     path('api/application/<int:application_id>/update/', UpdateApplicationStatusView.as_view()),
-    path('api/post-review/', PostReviewView.as_view(), name='post-review'),
+    path('api/post-review/', PostReviewView.as_view(), name='post_review_api'),
     
-    
-    # --- Frontend Pages (HTML) ---
+    # --- Frontend Pages (Renders HTML Templates) ---
     path('', home_page, name='home'),
     path('login/', login_page, name='login_page'),
-    path('register/', register_page),
-    path('profile/', profile_page),
-    path('create-campaign/', create_campaign_page),
-    path('dashboard/', brand_dashboard),
-    path('influencer/dashboard/', influencer_dashboard), # Naya Route
+    path('register/', register_page, name='register_page'),
+    path('profile/', profile_page, name='profile_page'),
+    path('create-campaign/', create_campaign_page, name='create_campaign_page'),
+    path('dashboard/', brand_dashboard, name='brand_dashboard'),
+    path('influencer/dashboard/', influencer_dashboard, name='influencer_dashboard'),
 ]
-from django.conf import settings
-from django.conf.urls.static import static
 
-# Ye line local aur production dono ke liye safety net hai
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Serving Static & Media files safely during local development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

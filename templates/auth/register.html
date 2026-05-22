@@ -5,12 +5,12 @@
 
 <style>
   :root {
-    --bg-color: #fcfaf7;       /* Soft Beige/Off-white */
+    --bg-color: #fcfaf7;
     --card-bg: #ffffff;
-    --text-main: #1a1a1a;     /* Deep Black */
+    --text-main: #1a1a1a;
     --text-muted: #666666;
-    --accent: #1a1a1a;        /* Solid Black for buttons */
-    --border: #e5e0d8;        /* Subtle beige border */
+    --accent: #1a1a1a;
+    --border: #e5e0d8;
     --error: #d93025;
   }
 
@@ -43,7 +43,6 @@
   .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.5px; }
   .header p { color: var(--text-muted); font-size: 14px; }
 
-  /* Minimal Role Selector */
   .role-select {
     display: flex;
     gap: 10px;
@@ -72,7 +71,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
 
-  /* Form Elements */
   .form-group { margin-bottom: 20px; }
   .form-group label {
     display: block;
@@ -136,41 +134,53 @@
     text-align: center;
   }
   .error-box { background: #fdf2f2; color: var(--error); border: 1px solid #f9d6d6; }
+  
+  #otpStep { display: none; } /* Hidden initially */
 </style>
 
 <div class="main-container">
   <div class="auth-card">
     <div class="header">
       <h1>EaseMyCollab</h1>
-      <p>Create your professional account</p>
+      <p id="headerDesc">Create your professional account</p>
     </div>
 
     <div id="statusMsg" class="msg-box"></div>
 
-    <div class="role-select">
-      <input type="radio" name="role" id="influencer" value="influencer" checked>
-      <label for="influencer">Influencer</label>
-      
-      <input type="radio" name="role" id="brand" value="brand">
-      <label for="brand">Brand</label>
+    <div id="detailsStep">
+      <div class="role-select">
+        <input type="radio" name="role" id="influencer" value="influencer" checked>
+        <label for="influencer">Influencer</label>
+        
+        <input type="radio" name="role" id="brand" value="brand">
+        <label for="brand">Brand</label>
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" class="input-field" placeholder="pankaj_ducs">
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" class="input-field" placeholder="name@example.com">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" class="input-field" placeholder="••••••••">
+      </div>
+
+      <button id="submitBtn" class="btn-primary" onclick="handleRegister()">Create Account</button>
     </div>
 
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="username" class="input-field" placeholder="pankaj_ducs">
+    <div id="otpStep">
+      <div class="form-group">
+        <label>Enter Email OTP</label>
+        <input type="text" id="emailOtp" class="input-field" placeholder="000000" maxlength="6">
+      </div>
+      <button id="verifyBtn" class="btn-primary" onclick="handleVerifyOTP()">Verify & Activate</button>
     </div>
-
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="email" class="input-field" placeholder="name@example.com">
-    </div>
-
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" class="input-field" placeholder="••••••••">
-    </div>
-
-    <button id="submitBtn" class="btn-primary" onclick="handleRegister()">Create Account</button>
 
     <div class="footer-text">
       Already have an account? <a href="/login/">Sign in</a>
@@ -179,29 +189,27 @@
 </div>
 
 <script>
+  // Step 1: Submit Details and Request Mail OTP
   async function handleRegister() {
     const btn = document.getElementById('submitBtn');
     const msgBox = document.getElementById('statusMsg');
     
-    // Get values
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const role = document.querySelector('input[name="role"]:checked').value;
 
-    // Basic validation
     if(!username || !email || !password) {
       showError("Please fill all fields");
       return;
     }
 
-    // UI State
     btn.disabled = true;
     btn.innerText = "Processing...";
     msgBox.style.display = "none";
 
     try {
-      const response = await fetch("https://easemycollab.onrender.com/api/register/", {
+      const response = await fetch("/api/register/send-otp/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password, role })
@@ -210,13 +218,17 @@
       const data = await response.json();
 
       if (response.ok) {
-        msgBox.className = "msg-box" ; // Success style would go here
+        // Toggle view blocks smoothly
+        document.getElementById('detailsStep').style.display = 'none';
+        document.getElementById('otpStep').style.display = 'block';
+        document.getElementById('headerDesc').innerText = "Verify your email identity";
+        
+        msgBox.className = "msg-box";
         msgBox.style.backgroundColor = "#f0fdf4";
         msgBox.style.color = "#166534";
         msgBox.style.border = "1px solid #bbf7d0";
-        msgBox.innerText = "Registration successful! Redirecting...";
+        msgBox.innerText = data.message || "OTP Sent! Check your email.";
         msgBox.style.display = "block";
-        setTimeout(() => window.location.href = "/login/", 1500);
       } else {
         showError(data.error || "Something went wrong");
         btn.disabled = false;
@@ -226,6 +238,50 @@
       showError("Server connection failed. Try again.");
       btn.disabled = false;
       btn.innerText = "Create Account";
+    }
+  }
+
+  // Step 2: Validate the user token to register user instance inside backend DB
+  async function handleVerifyOTP() {
+    const btn = document.getElementById('verifyBtn');
+    const msgBox = document.getElementById('statusMsg');
+    const email = document.getElementById('email').value.trim();
+    const otp = document.getElementById('emailOtp').value.trim();
+
+    if(!otp) {
+      showError("Please enter the verification OTP code");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Activating...";
+
+    try {
+      const response = await fetch("/api/register/verify-otp/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp })
+      });
+
+      const data = await response.json();
+
+      if(response.ok) {
+        msgBox.className = "msg-box";
+        msgBox.style.backgroundColor = "#f0fdf4";
+        msgBox.style.color = "#166534";
+        msgBox.style.border = "1px solid #bbf7d0";
+        msgBox.innerText = "Verification successful! Redirecting...";
+        msgBox.style.display = "block";
+        setTimeout(() => window.location.href = "/login/", 1500);
+      } else {
+        showError(data.error || "Invalid OTP code entered.");
+        btn.disabled = false;
+        btn.innerText = "Verify & Activate";
+      }
+    } catch(err) {
+      showError("Verification request encountered an error.");
+      btn.disabled = false;
+      btn.innerText = "Verify & Activate";
     }
   }
 

@@ -205,6 +205,9 @@
     if (data.name) {
       document.getElementById("headerName").textContent = data.name;
       document.getElementById("avatarIcon").textContent = data.name.charAt(0).toUpperCase();
+    } else {
+      document.getElementById("headerName").textContent = "Profile Settings";
+      document.getElementById("avatarIcon").textContent = "✦";
     }
 
     const btnRow = document.getElementById("btnRow");
@@ -218,15 +221,19 @@
   }
 
   function loadProfile() {
-    let apiUrl = "https://easemycollab.onrender.com/api/profile/";
+    // FIX: Relative path used instead of hardcoded absolute domain address
+    let apiUrl = "/api/profile/";
     if (targetUserId) apiUrl += `?user_id=${targetUserId}`;
 
     fetch(apiUrl, {
       headers: { "Authorization": "Bearer " + token }
     })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Auth verification failed");
+      return res.json();
+    })
     .then(data => fillFields(data))
-    .catch(err => showToast("Error loading profile"));
+    .catch(err => showToast("Error loading profile. Check auth context."));
   }
 
   function enableEdit() {
@@ -252,7 +259,8 @@
       youtube: document.getElementById("youtube").value,
     };
 
-    fetch("https://easemycollab.onrender.com/api/profile/", {
+    // FIX: Clean relative post route matching configuration standards
+    fetch("/api/profile/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

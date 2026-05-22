@@ -137,6 +137,10 @@
 
     <button id="loginBtn" class="btn-primary" onclick="handleLogin()">Sign In</button>
 
+    <div class="footer-text" style="margin-top: 16px;">
+  <a href="/forgot-password/" style="font-weight: 400; font-size: 12px; color: var(--text-muted);">Forgot Password?</a>
+</div>
+
     <div class="footer-text">
       New here? <a href="/register/">Create an account</a>
     </div>
@@ -144,7 +148,7 @@
 </div>
 
 <script>
-  // Enter key support
+  // Enter key submission handler support
   document.addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
 
   async function handleLogin() {
@@ -163,7 +167,8 @@
     errorBox.style.display = "none";
 
     try {
-      const response = await fetch("https://easemycollab.onrender.com/api/login/", {
+      // FIX: Changed hardcoded domain to relative environment matching endpoints mapping path route
+      const response = await fetch("/api/login/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -173,14 +178,21 @@
 
       if (response.ok) {
         localStorage.setItem("token", data.access);
-        localStorage.setItem("role", data.user.role);
+        
+        // Defensive role identity tracking execution parameter mapping
+        const userRole = data.user && data.user.role ? data.user.role : "influencer";
+        localStorage.setItem("role", userRole);
         
         btn.style.background = "#166534";
         btn.innerText = "✓ Success";
         
-        // Redirect based on role
+        // Dynamic redirection block engine management
         setTimeout(() => {
-          window.location.href = data.user.role === "brand" ? "/dashboard/" : "/";
+          if (userRole === "brand") {
+            window.location.href = "/dashboard/";
+          } else {
+            window.location.href = "/";
+          }
         }, 800);
       } else {
         showError(data.detail || "Invalid credentials");

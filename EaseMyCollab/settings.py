@@ -84,15 +84,20 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
+# Caching Configuration (LocMemCache works out of the box without Redis setup)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake-easemycollab',
+    }
+}
 # 8. EMAIL SETTINGS (OTP Feature)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
-EMAIL_HOST_PASSWORD = 'dwrk uioj thel gtzy' # Pakka check karna ye App Password hai
-EMAIL_TIMEOUT = 10
+EMAIL_HOST_PASSWORD = 'tord mpul fbxx ijrk' # Pakka check karna ye App Password hai
 # 9. STATIC & MEDIA FILES
 # settings.py mein ye update karo
 STATIC_URL = '/static/'  # Shuru mein slash zaroori hai

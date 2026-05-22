@@ -104,38 +104,39 @@ class RegisterView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 class LoginView(APIView):
+    """Secure clean login API providing validation tokens for EaseMyCollab"""
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        username = request.data.get('username', '').strip()
+        password = request.data.get('password', '')
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not username or not password:
+            return Response({"detail": "Please provide both username and password."}, status=status.HTTP_400_BAD_REQUEST)
 
-        username = serializer.validated_data['username']
-        password = serializer.validated_data['password']
-
+        # Django authenticate uses password hashing systems automatically
         user = authenticate(username=username, password=password)
 
-        if user is None:
-            return Response({"error": "Invalid credentials"}, status=401)
-
-        # 🔑 Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-
-        return Response({
-            "message": "Login successful",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "role": user.role
-            }
-        })
+        if user is not None:
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "role": user.role
+                }
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
     
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -240,41 +241,138 @@ class ProfileView(APIView):
 
         return Response({"message": "Profile updated successfully"})
     
+import random
+from django.conf import settings
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LoginSerializer
+
+User = get_user_model()
+
+class SendRegistrationOTPView(APIView):
+    """Step 1: Validate details and send an OTP to email without creating the user yet."""
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        username = request.data.get('username', '').strip()
+        password = request.data.get('password', '')
+        role = request.data.get('role', 'influencer')
+
+        if not email or not username or not password:
+            return Response({"error": "Username, email, and password are required!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Bhai, ye email pehle se registered hai!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Ye username koi le chuka hai!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Generate 6 digit OTP
+        otp = str(random.randint(100000, 999999))
+        
+        # Structure the registration payload to save in cache temporary
+        user_data = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "role": role,
+            "otp": otp
+        }
+        
+        # Save payload in cache for 5 minutes (300 seconds)
+        cache.set(f'reg_{email}', user_data, timeout=300)
+
+        try:
+            send_mail(
+                'Verify Your EaseMyCollab Account',
+                f'Aapka registration OTP hai: {otp}. It is valid for 5 minutes.',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+            return Response({"message": "OTP Sent successfully! Please check your email."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VerifyRegistrationOTPView(APIView):
+    """Step 2: Check OTP from cache. If matched, create the User record in DB."""
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        otp_received = request.data.get('otp', '').strip()
+
+        cached_data = cache.get(f'reg_{email}')
+        
+        if not cached_data:
+            return Response({"error": "OTP expired ya details invalid hain. Please click resend."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if cached_data['otp'] != otp_received:
+            return Response({"error": "Galat OTP dala hai aapne!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # OTP matches! Create user now
+            user = User.objects.create_user(
+                username=cached_data['username'],
+                email=cached_data['email'],
+                password=cached_data['password'],
+                role=cached_data['role']
+            )
+            
+            # Clean cache after successful registration
+            cache.delete(f'reg_{email}')
+            
+            return Response({"message": "Registration successful! Your account is active."}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ForgotPasswordView(APIView):
+    """Step 1 for Forgot Password: Check if email exists, cache OTP."""
     def post(self, request):
-        email = request.data.get('email')
+        email = request.data.get('email', '').strip().lower()
+        
         if not User.objects.filter(email=email).exists():
-            return Response({"error": "Bhai, ye email registered nahi hai!"}, status=404)
+            return Response({"error": "Bhai, ye email registered nahi hai!"}, status=status.HTTP_404_NOT_FOUND)
 
         otp = str(random.randint(100000, 999999))
-        cache.set(f'reset_otp_{email}', otp, timeout=300) # 5 mins valid
+        cache.set(f'reset_otp_{email}', otp, timeout=300) # Valid for 5 mins
 
         try:
             send_mail(
                 'Password Reset OTP - EaseMyCollab',
                 f'Aapka password reset OTP hai: {otp}',
-                'noreply@easemycollab.com',
+                settings.EMAIL_HOST_USER,
                 [email],
                 fail_silently=False,
             )
-            return Response({"message": "OTP bhej diya gaya hai."})
-        except:
-            return Response({"error": "Email sending failed."}, status=500)
+            return Response({"message": "Password reset OTP bhej diya gaya hai."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Email sending failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ResetPasswordView(APIView):
+    """Step 2 for Forgot Password: Match OTP and set new password safely."""
     def post(self, request):
-        email = request.data.get('email')
-        otp_received = request.data.get('otp')
-        new_password = request.data.get('new_password')
+        email = request.data.get('email', '').strip().lower()
+        otp_received = request.data.get('otp', '').strip()
+        new_password = request.data.get('new_password', '')
+
+        if not new_password:
+            return Response({"error": "New password cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
         stored_otp = cache.get(f'reset_otp_{email}')
         if not stored_otp or stored_otp != otp_received:
-            return Response({"error": "Invalid or expired OTP"}, status=400)
+            return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Update Password securely using set_password
         user = User.objects.get(email=email)
         user.set_password(new_password)
         user.save()
 
+        # Evict cache key
         cache.delete(f'reset_otp_{email}')
-        return Response({"message": "Password updated successfully!"})
+        return Response({"message": "Password updated successfully!"}, status=status.HTTP_200_OK)
