@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaseMyCollab — Frontend Documentation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --bg: #0D0F12; --bg2: #151820; --bg3: #1C2030; --card: #1A1E2A;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --text: #E8EAF0; --muted: #7A8099;
+    --accent: #5B7CFA; --accent2: #A78BFA;
+    --green: #34D399; --amber: #FBBF24; --coral: #FB7185; --teal: #2DD4BF;
+    --blue-dim: rgba(91,124,250,0.12); --purple-dim: rgba(167,139,250,0.12);
+    --green-dim: rgba(52,211,153,0.1); --coral-dim: rgba(251,113,133,0.1);
+    --amber-dim: rgba(251,191,36,0.1); --teal-dim: rgba(45,212,191,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+
+  /* SIDEBAR */
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; z-index: 100; padding-bottom: 40px; }
+  .sidebar-logo { padding: 24px 24px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .sidebar-logo h1 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sidebar-logo p { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .nav-section { padding: 6px 16px 2px; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; margin-top: 12px; }
+  .nav-item { display: block; padding: 7px 24px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: all 0.15s; }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--blue-dim); }
+
+  /* MAIN */
+  .main { margin-left: 260px; padding: 60px 64px; max-width: 1100px; }
+
+  /* HERO */
+  .hero { padding: 56px 0 48px; border-bottom: 1px solid var(--border); margin-bottom: 64px; }
+  .hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--green); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 18px; }
+  .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .chip { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 5px 12px; border-radius: 20px; }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 80px; scroll-margin-top: 40px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .section-header h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-left: auto; }
+  .badge-blue { background: var(--blue-dim); color: var(--accent); border: 1px solid rgba(91,124,250,0.2); }
+  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+
+  h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); margin: 28px 0 12px; letter-spacing: -0.2px; }
+  h4 { font-size: 11px; font-weight: 600; color: var(--muted); margin: 20px 0 8px; letter-spacing: 0.8px; text-transform: uppercase; }
+  p { color: #B0B8D0; margin-bottom: 12px; }
+
+  /* POINTER LISTS */
+  .pointer-list { list-style: none; margin: 0 0 16px; padding: 0; }
+  .pointer-list li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: #B0B8D0; align-items: flex-start; }
+  .pointer-list li:last-child { border-bottom: none; }
+  .pointer-list li::before { content: '→'; color: var(--green); font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+  .pointer-list strong { color: var(--text); font-weight: 500; }
+
+  /* CARDS */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .card-sm { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+
+  /* PAGE CARDS */
+  .page-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .page-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .page-card-top { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .page-url { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--teal); }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
+  .page-card-body { padding: 14px 18px; }
+
+  /* TAG */
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; letter-spacing: 0.5px; margin-right: 4px; }
+  .tag-blue { background: var(--blue-dim); color: var(--accent); }
+  .tag-green { background: var(--green-dim); color: var(--green); }
+  .tag-purple { background: var(--purple-dim); color: var(--accent2); }
+  .tag-amber { background: var(--amber-dim); color: var(--amber); }
+  .tag-coral { background: var(--coral-dim); color: var(--coral); }
+  .tag-teal { background: var(--teal-dim); color: var(--teal); }
+
+  /* DIAGRAM */
+  .diagram-wrap { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 32px 24px; margin: 16px 0 28px; overflow-x: auto; }
+  .diagram-wrap .mermaid { display: flex; justify-content: center; }
+
+  /* CODE */
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+  pre { background: #0A0C10; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 12px 0 20px; }
+  pre code { background: none; padding: 0; color: #B0D4FF; font-size: 12px; line-height: 1.7; }
+
+  /* TABLE */
+  .doc-table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  .doc-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border2); }
+  .doc-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: #B0B8D0; vertical-align: top; }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table td:first-child { color: var(--text); font-weight: 500; }
+
+  /* API CALL BLOCK */
+  .api-call { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+  .api-call-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); }
+  .method { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 4px; letter-spacing: 0.5px; min-width: 46px; text-align: center; }
+  .method.get { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .method.post { background: var(--blue-dim); color: var(--accent); border: 1px solid rgba(91,124,250,0.2); }
+  .api-path { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text); }
+  .api-label { font-size: 11px; color: var(--muted); margin-left: auto; }
+  .api-call-body { padding: 14px 16px; }
+
+  /* FLOW STEPS */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; margin: 16px 0 24px; }
+  .flow-step { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .flow-step:last-child { border-bottom: none; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-dim); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; border: 1px solid rgba(91,124,250,0.3); }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: var(--muted); }
+
+  /* DEPLOY TABLE */
+  .deploy-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .deploy-row:last-child { border-bottom: none; }
+  .deploy-key { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; min-width: 140px; }
+  .deploy-val { font-size: 13px; color: var(--text); font-family: 'IBM Plex Mono', monospace; }
+  .deploy-val.url { color: var(--teal); }
+
+  /* LIVE BADGE */
+  .live-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-dim); border: 1px solid rgba(52,211,153,0.25); color: var(--green); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+  /* LOCALSTORAGE VISUAL */
+  .ls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0 24px; }
+  .ls-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .ls-key { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--amber); margin-bottom: 6px; font-weight: 500; }
+  .ls-val { font-size: 12px; color: var(--muted); }
+  .ls-example { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--teal); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>EaseMyCollab</h1>
+    <p>Frontend Docs v1.0</p>
+  </div>
+
+  <span class="nav-section">Overview</span>
+  <a class="nav-item active" href="#overview">Project Overview</a>
+  <a class="nav-item" href="#tech-stack">Tech Stack</a>
+  <a class="nav-item" href="#architecture">Frontend Architecture</a>
+
+  <span class="nav-section">Pages</span>
+  <a class="nav-item" href="#page-home">Home Page</a>
+  <a class="nav-item" href="#page-auth">Login & Register</a>
+  <a class="nav-item" href="#page-forgot">Forgot Password</a>
+  <a class="nav-item" href="#page-brand-dash">Brand Dashboard</a>
+  <a class="nav-item" href="#page-inf-dash">Influencer Dashboard</a>
+  <a class="nav-item" href="#page-profile">Profile Page</a>
+  <a class="nav-item" href="#page-campaign">Create Campaign</a>
+
+  <span class="nav-section">API Integration</span>
+  <a class="nav-item" href="#auth-flow">Auth Flow</a>
+  <a class="nav-item" href="#token-mgmt">Token Management</a>
+  <a class="nav-item" href="#api-calls">All API Calls</a>
+
+  <span class="nav-section">Global</span>
+  <a class="nav-item" href="#navbar">Navbar Logic</a>
+  <a class="nav-item" href="#localstorage">localStorage Schema</a>
+  <a class="nav-item" href="#deployment">Render Deployment</a>
+  <a class="nav-item" href="#settings">Django Settings</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero" id="overview">
+    <div class="hero-eyebrow">Frontend Documentation</div>
+    <h1>How the <span>Frontend Works</span></h1>
+    <p class="hero-sub">Django templates + vanilla JavaScript + Fetch API. All pages are server-rendered HTML shells — the data is fetched client-side from the live Render deployment.</p>
+    <div class="hero-chips">
+      <span class="chip"><span class="chip-dot" style="background:var(--amber)"></span>Django Templates (Jinja2)</span>
+      <span class="chip"><span class="chip-dot" style="background:var(--accent)"></span>Vanilla JS + Fetch API</span>
+      <span class="chip"><span class="chip-dot" style="background:var(--green)"></span>Bootstrap 5.3</span>
+      <span class="chip"><span class="chip-dot" style="background:var(--teal)"></span>JWT in localStorage</span>
+      <span class="chip"><span class="chip-dot" style="background:var(--coral)"></span>Deployed on Render</span>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <section class="section" id="tech-stack">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🧱</div>
+      <h2>Tech Stack</h2>
+      <span class="badge badge-blue">Stack</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="tag tag-amber">Templating</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">Django Templates</div>
+        <div style="font-size:12px;color:var(--muted)">Jinja2-style. Each page extends <code>base.html</code> and fills the <code>{% block content %}</code> slot.</div>
+      </div>
+      <div class="card-sm">
+        <div class="tag tag-blue">CSS Framework</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">Bootstrap 5.3</div>
+        <div style="font-size:12px;color:var(--muted)">Loaded via CDN. Grid, utilities, and button classes used. Most styling is custom CSS variables.</div>
+      </div>
+      <div class="card-sm">
+        <div class="tag tag-green">API</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">Fetch API (async/await)</div>
+        <div style="font-size:12px;color:var(--muted)">Every data interaction is a <code>fetch()</code> call to the Render-deployed backend. No axios, no jQuery.</div>
+      </div>
+      <div class="card-sm">
+        <div class="tag tag-teal">Auth</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">JWT in localStorage</div>
+        <div style="font-size:12px;color:var(--muted)">Access token stored under <code>"token"</code> key. Sent as <code>Authorization: Bearer &lt;token&gt;</code> on every protected request.</div>
+      </div>
+      <div class="card-sm">
+        <div class="tag tag-purple">Fonts</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">Google Fonts</div>
+        <div style="font-size:12px;color:var(--muted)"><code>Playfair Display</code> for headings, <code>Inter</code> for body, <code>Plus Jakarta Sans</code> on the profile page.</div>
+      </div>
+      <div class="card-sm">
+        <div class="tag tag-coral">Hosting</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:6px 0 4px">Render (Web Service)</div>
+        <div style="font-size:12px;color:var(--muted)">Live at <code>easemycollab.onrender.com</code>. Static files served via WhiteNoise. Postgres on Render.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section class="section" id="architecture">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">🏗️</div>
+      <h2>Frontend Architecture</h2>
+      <span class="badge badge-green">How It Works</span>
+    </div>
+    <p>EaseMyCollab uses a <strong>server-rendered shell + client-side data</strong> pattern. Django renders the HTML page (with navbar, layout, and empty containers), and JavaScript <code>fetch()</code> calls fill in the live data from the API. There is no React, no Vue — just plain HTML templates with embedded JS.</p>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+graph LR
+  subgraph BROWSER ["Browser"]
+    HTML["Django-rendered HTML\n(template shell)"]
+    JS["Inline JS per page\nfetch() calls on DOMContentLoaded"]
+    LS["localStorage\ntoken, role, name"]
+    DOM["DOM updates\nInnerHTML injection"]
+  end
+
+  subgraph RENDER ["Render — easemycollab.onrender.com"]
+    DJANGO["Django + DRF"]
+    WN["WhiteNoise\nStatic files"]
+    PG[("PostgreSQL DB")]
+  end
+
+  HTML --> JS
+  JS -->|reads| LS
+  JS -->|fetch() with Bearer token| DJANGO
+  DJANGO --> PG
+  DJANGO -->|JSON response| JS
+  JS -->|innerHTML| DOM
+  WN -->|CSS, JS, images| BROWSER
+
+  style BROWSER fill:#1A1E2A,stroke:#2D3250,color:#E8EAF0
+  style RENDER fill:#1A2A1E,stroke:#2D5032,color:#E8EAF0
+      </div>
+    </div>
+
+    <h3>Template Inheritance</h3>
+    <p>Every page extends <code>base.html</code> which provides the full HTML shell, Bootstrap, global CSS, navbar include, footer include, and the global JS file.</p>
+    <div class="diagram-wrap">
+      <div class="mermaid">
+graph TD
+  BASE["base.html\nHTML shell, Bootstrap CDN\nnavbar include, footer include\nmain.js include"]
+
+  BASE --> HOME["home/home.html\nCampaign listing + apply"]
+  BASE --> LOGIN["auth/login.html\nSign in form"]
+  BASE --> REG["auth/register.html\nRole selector + sign up"]
+  BASE --> FORGOT["auth/forget_password.html\n2-step OTP reset"]
+  BASE --> BDASH["brand/dashboard.html\nMy campaigns + applicants"]
+  BASE --> IDASH["influencer/dashboard.html\nMy applications list"]
+  BASE --> PROF["profile.html\nView + edit profile"]
+  BASE --> CREATE["campaigns/create_campaign.html\nNew campaign form"]
+
+  style BASE fill:#1A1E2A,stroke:#5B7CFA,color:#E8EAF0
+      </div>
+    </div>
+
+    <h3>Key design patterns used</h3>
+    <ul class="pointer-list">
+      <li><strong>No page reloads for data</strong> — all API data is fetched via <code>fetch()</code> after <code>DOMContentLoaded</code> fires. The HTML from Django is just a static shell.</li>
+      <li><strong>Role-based UI branching</strong> — navbar and redirects differ for brands vs influencers, controlled by <code>localStorage.getItem("role")</code>.</li>
+      <li><strong>Optimistic UI</strong> — buttons are disabled and text changed immediately (e.g., "Applying...") before the API responds, then updated on success/failure.</li>
+      <li><strong>Toast notifications</strong> — a fixed-position <code>#toast</code> div appears and auto-dismisses after 3 seconds instead of <code>alert()</code> (on home and profile pages).</li>
+      <li><strong>Hard-coded Render URL</strong> — all <code>fetch()</code> calls point to <code>https://easemycollab.onrender.com/api/...</code> directly, even when served from the same domain.</li>
+    </ul>
+  </section>
+
+  <!-- ── HOME PAGE ── -->
+  <section class="section" id="page-home">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">🏠</div>
+      <h2>Home Page</h2>
+      <span class="badge badge-blue">/ (root)</span>
+    </div>
+    <p>The public landing page. Shows a hero section, stat strip, and all live campaigns fetched from the API. Influencers can apply directly from this page.</p>
+
+    <h3>What happens on page load</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Django serves the HTML shell</div>
+          <div class="step-desc">Base template renders with empty <code>#campaign-list</code> container showing "Scanning for new opportunities..."</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">JS calls <code>loadCampaigns()</code> immediately</div>
+          <div class="step-desc">No <code>DOMContentLoaded</code> wrapper — runs as soon as the script tag executes at bottom of page.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">GET /api/campaigns/ — no auth required</div>
+          <div class="step-desc">Public endpoint returns all campaigns. Response is JSON array of campaign objects.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Campaigns rendered into DOM</div>
+          <div class="step-desc"><code>data.forEach(c => ...)</code> creates a card div per campaign and appends it to <code>#campaign-list</code>. Also updates <code>#totalCampaigns</code> stat counter.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Express Interest button</div>
+          <div class="step-desc">Each card has a button calling <code>applyToCampaign(id)</code>. If no token in localStorage, shows toast + redirects to /login/. Otherwise POSTs to <code>/api/apply/:id/</code> with Bearer token.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method get">GET</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/campaigns/</span>
+        <span class="api-label">No auth</span>
+      </div>
+      <div class="api-call-body">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Returns all campaigns. Rendered into campaign cards.</div>
+        <pre><code>// Each item rendered as:
+{ id, title, description, budget_range, status, deadline, ... }</code></pre>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/apply/:id/</span>
+        <span class="api-label">Bearer token required</span>
+      </div>
+      <div class="api-call-body">
+        <div style="font-size:12px;color:var(--muted)">No body needed. Campaign ID in URL. Returns 201 on success, 400 if already applied.</div>
+      </div>
+    </div>
+
+    <h3>Key UI details</h3>
+    <ul class="pointer-list">
+      <li><strong>Stats strip</strong> — "Active Gigs" count is dynamically set to <code>data.length</code>. Other stats (1.2k+ creators, 500+ brands, ₹5M+ paid) are hardcoded placeholder values.</li>
+      <li><strong>Button state management</strong> — on click, button is immediately disabled and text changes to "Applying...". On success: "✓ Applied". On failure: re-enabled with original text.</li>
+      <li><strong>Error handling</strong> — network failures caught in try/catch, show "Network Error" toast. API errors show "Failed to apply" toast.</li>
+      <li><strong>Category field</strong> — uses <code>c.category || 'Collaboration'</code> as fallback since Campaign model has no category field yet.</li>
+    </ul>
+  </section>
+
+  <!-- ── AUTH PAGES ── -->
+  <section class="section" id="page-auth">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🔐</div>
+      <h2>Login & Register Pages</h2>
+      <span class="badge badge-blue">/login/ &nbsp; /register/</span>
+    </div>
+
+    <div class="page-grid">
+      <div class="page-card">
+        <div class="page-card-top">
+          <span class="page-url">/login/</span>
+          <span class="tag tag-blue" style="margin:0;margin-left:auto">auth/login.html</span>
+        </div>
+        <div class="page-card-body">
+          <ul class="pointer-list">
+            <li><strong>Enter key support</strong> — <code>keydown</code> event listener calls <code>handleLogin()</code> on Enter keypress</li>
+            <li><strong>Validation</strong> — checks both fields are non-empty before firing fetch</li>
+            <li><strong>API call</strong> — POST /api/login/ with username + password as JSON</li>
+            <li><strong>On success</strong> — stores <code>token</code> (access) and <code>role</code> in localStorage. Shows green button "✓ Success". Redirects to /dashboard/ (brand) or / (influencer) after 800ms</li>
+            <li><strong>On failure</strong> — shows red error box below the form with <code>data.detail || "Invalid credentials"</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page-card">
+        <div class="page-card-top">
+          <span class="page-url">/register/</span>
+          <span class="tag tag-purple" style="margin:0;margin-left:auto">auth/register.html</span>
+        </div>
+        <div class="page-card-body">
+          <ul class="pointer-list">
+            <li><strong>Role selector</strong> — segmented control (radio buttons styled as pills): "Influencer" selected by default, "Brand" as second option</li>
+            <li><strong>Fields</strong> — username, email, password. All three required (validated before fetch)</li>
+            <li><strong>API call</strong> — POST /api/register/ with all 4 fields including selected role</li>
+            <li><strong>On success</strong> — shows green success message "Registration successful! Redirecting..." then navigates to /login/ after 1500ms</li>
+            <li><strong>On failure</strong> — shows <code>data.error</code> in red error box (e.g. "Username already taken")</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/login/</span>
+        <span class="api-label">Returns JWT tokens</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>// Request
+{ "username": "mynick", "password": "pass123" }
+
+// On success → stored to localStorage:
+localStorage.setItem("token", data.access)   // JWT access token
+localStorage.setItem("role", data.user.role)  // "brand" or "influencer"</code></pre>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/register/</span>
+        <span class="api-label">Creates user + profile</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>// Request
+{ "username": "mynick", "email": "me@brand.com", "password": "pass!", "role": "brand" }
+
+// Success → redirect to /login/
+// Failure → show data.error</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FORGOT PASSWORD ── -->
+  <section class="section" id="page-forgot">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">🔑</div>
+      <h2>Forgot Password Page</h2>
+      <span class="badge badge-blue">(no dedicated route shown in urls.py, linked from login)</span>
+    </div>
+    <p>A two-step form. Step 1: enter email and request OTP. Step 2 (revealed after success): enter OTP and new password.</p>
+
+    <h3>How the 2-step UI works</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">User enters registered email → clicks "Send Reset OTP"</div>
+          <div class="step-desc">POST to <code>/api/forgot-password/</code> (relative URL — same domain). Uses relative URL unlike other pages.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">On success: email step hidden, OTP step revealed</div>
+          <div class="step-desc"><code>document.getElementById('emailStep').style.display = 'none'</code> and <code>resetFields</code> shown via <code>display: block</code>.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">User enters OTP + new password → clicks "Update Password"</div>
+          <div class="step-desc">POST to <code>/api/reset-password/</code> with email (remembered from step 1), OTP, and new_password.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">On success: alert + redirect to /login/</div>
+          <div class="step-desc">Uses <code>alert()</code> (not toast) for the success message on this page.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BRAND DASHBOARD ── -->
+  <section class="section" id="page-brand-dash">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">📊</div>
+      <h2>Brand Dashboard</h2>
+      <span class="badge badge-blue">/dashboard/</span>
+    </div>
+    <p>Brands see all their campaigns in a card grid. Clicking a campaign card expands it inline to show all applicants, with Accept/Reject buttons for pending ones.</p>
+
+    <h3>How data loads</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title"><code>DOMContentLoaded</code> → <code>loadCampaigns()</code></div>
+          <div class="step-desc">GET /api/my-campaigns/ with Bearer token. Campaigns sorted by ID descending (newest first).</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Each campaign card rendered with click handler</div>
+          <div class="step-desc"><code>card.onclick = () => toggleApplicants(c.id)</code>. Cards contain an empty <code>#applicants-{id}</code> div.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Click → <code>toggleApplicants(campaignId)</code></div>
+          <div class="step-desc">Accordion behavior: only one campaign's applicants shown at a time. Second click on same campaign collapses it.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">GET /api/applicants/:id/ → renders each applicant</div>
+          <div class="step-desc">Shows influencer name. Pending applications get Accept/Reject buttons. Accepted/rejected ones show a status tag.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Accept/Reject → POST /api/application/:id/update/</div>
+          <div class="step-desc">On success, calls <code>location.reload()</code> to refresh the full page so status tags update. <code>event.stopPropagation()</code> prevents the click from bubbling to the campaign card toggle.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method get">GET</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/my-campaigns/</span>
+        <span class="api-label">Brand's campaigns</span>
+      </div>
+      <div class="api-call-body"><div style="font-size:12px;color:var(--muted)">Returns campaigns belonging to this brand. Bearer token identifies which brand.</div></div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method get">GET</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/applicants/:campaignId/</span>
+        <span class="api-label">Lazy loaded on click</span>
+      </div>
+      <div class="api-call-body"><div style="font-size:12px;color:var(--muted)">Fetched only when brand clicks a campaign card — not upfront. Returns applicant name + status.</div></div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/application/:id/update/</span>
+        <span class="api-label">Accept or reject</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>{ "status": "accepted" }  // or "rejected"</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INFLUENCER DASHBOARD ── -->
+  <section class="section" id="page-inf-dash">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-dim)">📋</div>
+      <h2>Influencer Dashboard</h2>
+      <span class="badge badge-blue">/influencer/dashboard/</span>
+    </div>
+    <p>Influencers see all their past campaign applications with current status (pending/accepted/rejected), brand name (clickable to brand's profile), and the date they applied.</p>
+
+    <h3>How it works</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title"><code>DOMContentLoaded</code> → <code>loadApps()</code></div>
+          <div class="step-desc">GET /api/influencer/my-applications/ with Bearer token.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Empty state handled</div>
+          <div class="step-desc">If <code>data.length === 0</code>, shows a dashed empty state with a link to / to browse campaigns.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Applications rendered as app-cards</div>
+          <div class="step-desc">Each card shows: campaign title, brand name (clickable → <code>/profile/?user_id={brand_user_id}</code>), status badge with color coding, and applied date formatted with <code>toLocaleDateString()</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Status badge colors</h3>
+    <div class="card-grid">
+      <div class="card-sm" style="border-left:3px solid var(--amber)"><span class="tag tag-amber">pending</span><br><div style="font-size:12px;color:var(--muted);margin-top:4px">CSS class <code>.status-pending</code> — warm beige background</div></div>
+      <div class="card-sm" style="border-left:3px solid var(--green)"><span class="tag tag-green">accepted</span><br><div style="font-size:12px;color:var(--muted);margin-top:4px">CSS class <code>.status-accepted</code> — light green background</div></div>
+      <div class="card-sm" style="border-left:3px solid var(--coral)"><span class="tag tag-coral">rejected</span><br><div style="font-size:12px;color:var(--muted);margin-top:4px">CSS class <code>.status-rejected</code> — light red background</div></div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method get">GET</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/influencer/my-applications/</span>
+        <span class="api-label">Returns application history</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>// Each item:
+{ id, campaign_title, brand_name, brand_user_id, status, budget, applied_at }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROFILE PAGE ── -->
+  <section class="section" id="page-profile">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-dim)">👤</div>
+      <h2>Profile Page</h2>
+      <span class="badge badge-blue">/profile/ &nbsp; /profile/?user_id=X</span>
+    </div>
+    <p>Unified profile page for both brands and influencers. Supports two modes: viewing your own profile (with edit capability) or viewing someone else's public profile (read-only).</p>
+
+    <h3>How it determines what to show</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Parse URL for <code>?user_id</code> param</div>
+          <div class="step-desc"><code>const targetUserId = new URLSearchParams(window.location.search).get('user_id')</code></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Build API URL with optional user_id</div>
+          <div class="step-desc">If <code>targetUserId</code> exists: <code>/api/profile/?user_id=X</code>. Otherwise: <code>/api/profile/</code></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">API returns <code>is_owner</code> flag</div>
+          <div class="step-desc">If <code>data.is_owner === true</code>: show "Edit Details" button. If false: show nothing in the button row (read-only view).</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Fields filled via <code>fillFields(data)</code></div>
+          <div class="step-desc">Sets value on all inputs (name, industry, website, bio, instagram, youtube). Avatar letter set to first char of name.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Edit mode via <code>enableEdit()</code></div>
+          <div class="step-desc">Removes <code>disabled</code> from all <code>.custom-input</code> elements. Swaps button to "Cancel" + "Save Changes".</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">Save via POST /api/profile/ with all field values</div>
+          <div class="step-desc">On success: shows toast "Profile updated!" and calls <code>cancelEdit()</code> to go back to read-only state and reload data.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method get">GET</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/profile/?user_id=&lt;optional&gt;</span>
+        <span class="api-label">Own or public profile</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>// Returns:
+{ name, industry, website, bio, instagram, youtube, is_owner, role,
+  avg_rating, total_reviews, reviews: [...] }</code></pre>
+      </div>
+    </div>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/profile/</span>
+        <span class="api-label">Save edited profile</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>{ name, industry, website, bio, instagram, youtube }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CREATE CAMPAIGN PAGE ── -->
+  <section class="section" id="page-campaign">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">📣</div>
+      <h2>Create Campaign Page</h2>
+      <span class="badge badge-blue">/create-campaign/</span>
+    </div>
+    <p>A centered form card for brands to publish new campaigns. Accessible only to logged-in brand users (frontend checks token; backend checks role).</p>
+
+    <h3>How it works</h3>
+    <ul class="pointer-list">
+      <li><strong>Token check on submit</strong> — if <code>localStorage.getItem("token")</code> is null, shows alert and redirects to /login/.</li>
+      <li><strong>Validation</strong> — title and description are required. Budget and deadline are optional (but sent if provided).</li>
+      <li><strong>POST /api/create-campaign/</strong> — sends title, description, budget_range, deadline, status="open" as JSON with Bearer token.</li>
+      <li><strong>On success</strong> — button turns green "✓ Published", then redirects to /dashboard/ after 1000ms.</li>
+      <li><strong>On failure</strong> — alert with stringified error data. Button re-enabled.</li>
+    </ul>
+
+    <div class="api-call">
+      <div class="api-call-header">
+        <span class="method post">POST</span>
+        <span class="api-path">https://easemycollab.onrender.com/api/create-campaign/</span>
+        <span class="api-label">Brand only</span>
+      </div>
+      <div class="api-call-body">
+        <pre><code>{ title, description, budget_range, deadline, status: "open" }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AUTH FLOW ── -->
+  <section class="section" id="auth-flow">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🔄</div>
+      <h2>Complete Auth Flow</h2>
+      <span class="badge badge-green">DFD</span>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+sequenceDiagram
+  participant U as User (Browser)
+  participant LS as localStorage
+  participant BE as Backend API (Render)
+  participant NAV as Navbar JS
+
+  U->>BE: POST /api/register/ {username, email, password, role}
+  BE-->>U: 201 Registration successful
+  U->>U: redirect → /login/
+
+  U->>BE: POST /api/login/ {username, password}
+  BE-->>U: {access, refresh, user{id, username, role}}
+  U->>LS: setItem("token", access)
+  U->>LS: setItem("role", role)
+  U->>U: redirect → /dashboard/ or /
+
+  Note over U,NAV: On every page load
+  NAV->>LS: getItem("token") + getItem("role")
+  alt token exists
+    NAV->>U: Show Dashboard link, Profile avatar, Logout button
+  else no token
+    NAV->>U: Show Login + Join Now links
+  end
+
+  Note over U,BE: On protected API call
+  U->>BE: fetch(url, headers: {Authorization: "Bearer " + token})
+  BE-->>U: Data or 401 Unauthorized
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TOKEN MANAGEMENT ── -->
+  <section class="section" id="token-mgmt">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">🗝️</div>
+      <h2>Token Management</h2>
+      <span class="badge badge-blue">localStorage</span>
+    </div>
+    <p>JWT is stored client-side in <code>localStorage</code>. No refresh token logic is implemented on the frontend — when the access token expires (60 min), the user must log in again.</p>
+
+    <div class="ls-grid">
+      <div class="ls-item">
+        <div class="ls-key">"token"</div>
+        <div class="ls-val">JWT access token from login response</div>
+        <div class="ls-example">eyJhbGciOiJIUzI1NiIs...</div>
+      </div>
+      <div class="ls-item">
+        <div class="ls-key">"role"</div>
+        <div class="ls-val">User role for UI branching</div>
+        <div class="ls-example">"brand" | "influencer"</div>
+      </div>
+      <div class="ls-item">
+        <div class="ls-key">"name"</div>
+        <div class="ls-val">Display name for navbar avatar</div>
+        <div class="ls-example">"Pankaj" — first char shown</div>
+      </div>
+    </div>
+
+    <h3>How token is used</h3>
+    <pre><code>// Every protected fetch call looks like this:
+const token = localStorage.getItem("token");
+
+const res = await fetch("https://easemycollab.onrender.com/api/my-campaigns/", {
+  headers: { "Authorization": "Bearer " + token }
+});
+
+// For POST with body:
+const res = await fetch("https://easemycollab.onrender.com/api/create-campaign/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + token
+  },
+  body: JSON.stringify({ title, description, budget_range, deadline, status: "open" })
+});</code></pre>
+
+    <h3>Logout</h3>
+    <ul class="pointer-list">
+      <li><strong>Navbar logout button</strong> — calls <code>handleLogout()</code> which does <code>localStorage.clear()</code> then redirects to /login/.</li>
+      <li><strong>No server-side session invalidation</strong> — JWT is stateless; clearing localStorage is sufficient for the client. Token remains valid server-side until expiry (60 min).</li>
+    </ul>
+  </section>
+
+  <!-- ── ALL API CALLS ── -->
+  <section class="section" id="api-calls">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--teal-dim)">📡</div>
+      <h2>All Frontend API Calls</h2>
+      <span class="badge badge-blue">Complete List</span>
+    </div>
+    <p>Every <code>fetch()</code> call made from the frontend, mapped to which page makes it and what it's used for.</p>
+
+    <table class="doc-table">
+      <thead><tr><th>Page</th><th>Method</th><th>Endpoint</th><th>Auth?</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Home</td><td><span class="tag tag-green" style="margin:0">GET</span></td><td><code>/api/campaigns/</code></td><td>No</td><td>Load all campaigns for listing</td></tr>
+        <tr><td>Home</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/apply/:id/</code></td><td>Bearer</td><td>Apply to a campaign from card</td></tr>
+        <tr><td>Login</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/login/</code></td><td>No</td><td>Authenticate, receive JWT</td></tr>
+        <tr><td>Register</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/register/</code></td><td>No</td><td>Create new user account</td></tr>
+        <tr><td>Forgot Password</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/forgot-password/</code></td><td>No</td><td>Send OTP to email</td></tr>
+        <tr><td>Forgot Password</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/reset-password/</code></td><td>No</td><td>Validate OTP + set new password</td></tr>
+        <tr><td>Brand Dashboard</td><td><span class="tag tag-green" style="margin:0">GET</span></td><td><code>/api/my-campaigns/</code></td><td>Bearer</td><td>Load brand's own campaigns</td></tr>
+        <tr><td>Brand Dashboard</td><td><span class="tag tag-green" style="margin:0">GET</span></td><td><code>/api/applicants/:id/</code></td><td>Bearer</td><td>Load applicants for a campaign (lazy, on click)</td></tr>
+        <tr><td>Brand Dashboard</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/application/:id/update/</code></td><td>Bearer</td><td>Accept or reject an applicant</td></tr>
+        <tr><td>Influencer Dashboard</td><td><span class="tag tag-green" style="margin:0">GET</span></td><td><code>/api/influencer/my-applications/</code></td><td>Bearer</td><td>Load influencer's application history</td></tr>
+        <tr><td>Profile (GET)</td><td><span class="tag tag-green" style="margin:0">GET</span></td><td><code>/api/profile/?user_id=X</code></td><td>Bearer</td><td>Load own or another user's profile</td></tr>
+        <tr><td>Profile (POST)</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/profile/</code></td><td>Bearer</td><td>Save edited profile fields</td></tr>
+        <tr><td>Create Campaign</td><td><span class="tag tag-blue" style="margin:0">POST</span></td><td><code>/api/create-campaign/</code></td><td>Bearer</td><td>Publish new campaign</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── NAVBAR ── -->
+  <section class="section" id="navbar">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-dim)">🧭</div>
+      <h2>Navbar Logic</h2>
+      <span class="badge badge-blue">navbar.html</span>
+    </div>
+    <p>The navbar is a standalone include file (<code>navbar.html</code>) included in every page via base.html. It dynamically builds its content based on <code>localStorage</code> using the <code>updateNavbar()</code> function.</p>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+flowchart TD
+  LOAD["DOMContentLoaded\nupdateNavbar() fires"]
+  TOKEN{localStorage\nhas token?}
+
+  LOAD --> TOKEN
+
+  TOKEN -->|Yes| LOGGED["Show:\nDashboard link\nCreate link (brand only)\nProfile avatar pill\nLogout button\nHamburger (mobile)"]
+
+  TOKEN -->|No| GUEST["Show:\nLogin link\nJoin Now button\nNo hamburger"]
+
+  LOGGED --> ROLE{role = 'brand'?}
+  ROLE -->|Yes| BRAND_NAV["Dashboard → /dashboard/\nCreate → /create-campaign/"]
+  ROLE -->|No| INF_NAV["Dashboard → /influencer/dashboard/\nNo create link"]
+
+  style LOGGED fill:#1A2A1E,stroke:#34D399,color:#E8EAF0
+  style GUEST fill:#2A1A1A,stroke:#FB7185,color:#E8EAF0
+      </div>
+    </div>
+
+    <h3>Key details</h3>
+    <ul class="pointer-list">
+      <li><strong>Sticky navbar</strong> — <code>position: sticky; top: 0; z-index: 1000</code> with <code>backdrop-filter: blur(12px)</code> for glass effect.</li>
+      <li><strong>Avatar pill</strong> — shows first letter of name from <code>localStorage.getItem("name")</code>. Falls back to "U" if not set.</li>
+      <li><strong>Active link highlight</strong> — compares <code>window.location.pathname</code> to each link's <code>href</code> and adds <code>.active</code> class on match.</li>
+      <li><strong>Mobile hamburger</strong> — hidden for guest users (no token). Only shown when logged in. Toggles <code>.nav-mobile</code> visibility and animates the middle bar opacity.</li>
+      <li><strong>Logout</strong> — calls <code>handleLogout()</code>: <code>localStorage.clear()</code> then <code>window.location.href = "/login/"</code>.</li>
+    </ul>
+  </section>
+
+  <!-- ── LOCALSTORAGE ── -->
+  <section class="section" id="localstorage">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">💾</div>
+      <h2>localStorage Schema</h2>
+      <span class="badge badge-blue">Client State</span>
+    </div>
+    <p>All client-side session state lives in <code>localStorage</code>. There are no cookies, no session middleware used from the frontend side.</p>
+
+    <table class="doc-table">
+      <thead><tr><th>Key</th><th>Set When</th><th>Used By</th><th>Cleared When</th></tr></thead>
+      <tbody>
+        <tr><td><code>"token"</code></td><td>Login success → <code>data.access</code></td><td>All protected fetch() calls as Bearer token</td><td>Logout → <code>localStorage.clear()</code></td></tr>
+        <tr><td><code>"role"</code></td><td>Login success → <code>data.user.role</code></td><td>Navbar rendering, dashboard redirect logic</td><td>Logout</td></tr>
+        <tr><td><code>"name"</code></td><td>Not explicitly set in current code (navbar falls back to "User")</td><td>Navbar avatar initial letter</td><td>Logout</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card" style="border-left:3px solid var(--amber)">
+      <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:8px">⚠️ Known gap</div>
+      <div style="font-size:13px;color:#B0B8D0">The <code>"name"</code> key is read by the navbar (<code>localStorage.getItem("name") || "User"</code>) but is never explicitly set during login or registration. The navbar avatar will always show "U" as the fallback initial unless name is set manually elsewhere.</div>
+    </div>
+  </section>
+
+  <!-- ── DEPLOYMENT ── -->
+  <section class="section" id="deployment">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">🚀</div>
+      <h2>Render Deployment</h2>
+      <span class="badge badge-green">Live</span>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <span class="live-badge"><span class="live-dot"></span>Live at easemycollab.onrender.com</span>
+    </div>
+
+    <div class="card">
+      <div class="deploy-row"><span class="deploy-key">Live URL</span><span class="deploy-val url">https://easemycollab.onrender.com</span></div>
+      <div class="deploy-row"><span class="deploy-key">Platform</span><span class="deploy-val">Render (Web Service)</span></div>
+      <div class="deploy-row"><span class="deploy-key">Server</span><span class="deploy-val">Gunicorn (via Procfile)</span></div>
+      <div class="deploy-row"><span class="deploy-key">Database</span><span class="deploy-val">PostgreSQL (Render Managed) via DATABASE_URL env var</span></div>
+      <div class="deploy-row"><span class="deploy-key">Static Files</span><span class="deploy-val">WhiteNoise + CompressedManifestStaticFilesStorage</span></div>
+      <div class="deploy-row"><span class="deploy-key">CORS Origins</span><span class="deploy-val">easemycollab.onrender.com, localhost:8000</span></div>
+      <div class="deploy-row"><span class="deploy-key">JWT Expiry</span><span class="deploy-val">60 minutes (ACCESS_TOKEN_LIFETIME)</span></div>
+      <div class="deploy-row"><span class="deploy-key">Email</span><span class="deploy-val">Gmail SMTP (smtp.gmail.com:587, TLS)</span></div>
+    </div>
+
+    <h3>Procfile</h3>
+    <pre><code>web: gunicorn EaseMyCollab.wsgi --log-file -</code></pre>
+
+    <h3>How deployment works</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Code pushed to GitHub</div>
+          <div class="step-desc">Render auto-detects the Python project from requirements.txt</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Render runs build</div>
+          <div class="step-desc"><code>pip install -r requirements.txt</code> then <code>python manage.py collectstatic --noinput</code></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Render sets env vars</div>
+          <div class="step-desc"><code>DATABASE_URL</code> pointing to managed Postgres, <code>DEBUG=False</code> for production</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Gunicorn starts via Procfile</div>
+          <div class="step-desc">Serves Django app over WSGI. WhiteNoise serves <code>/static/</code> files directly from the process — no Nginx needed.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Settings automatically switch DB</div>
+          <div class="step-desc"><code>if DATABASE_URL:</code> → uses <code>dj_database_url.config()</code> for PostgreSQL. Else → falls back to SQLite for local dev.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Static files pipeline</h3>
+    <ul class="pointer-list">
+      <li><strong>Development</strong> — Django serves <code>/static/</code> from <code>static/</code> dir directly. CSS lives at <code>static/css/style.css</code>, JS at <code>static/js/main.js</code>.</li>
+      <li><strong>Production collectstatic</strong> — <code>python manage.py collectstatic</code> copies all static files into <code>staticfiles/</code> directory.</li>
+      <li><strong>WhiteNoise</strong> — <code>WhiteNoiseMiddleware</code> in MIDDLEWARE (after SecurityMiddleware) serves files from <code>staticfiles/</code> with compression and long-term caching via <code>CompressedManifestStaticFilesStorage</code>.</li>
+      <li><strong>Template static tags</strong> — <code>{% load static %}</code> in templates generates correct URLs like <code>/static/css/style.css</code> which WhiteNoise intercepts.</li>
+    </ul>
+  </section>
+
+  <!-- ── SETTINGS ── -->
+  <section class="section" id="settings">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--coral-dim)">⚙️</div>
+      <h2>Django Settings — Frontend-Relevant Config</h2>
+      <span class="badge badge-blue">settings.py</span>
+    </div>
+
+    <table class="doc-table">
+      <thead><tr><th>Setting</th><th>Value</th><th>Why it matters for frontend</th></tr></thead>
+      <tbody>
+        <tr><td><code>ALLOWED_HOSTS</code></td><td>easemycollab.onrender.com, .onrender.com, localhost</td><td>Requests from other hosts get 400 Bad Request</td></tr>
+        <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td>easemycollab.onrender.com, localhost:8000</td><td>Cross-origin fetch() calls from these origins are permitted</td></tr>
+        <tr><td><code>CORS_ALLOW_CREDENTIALS</code></td><td>True</td><td>Allows cookies/auth headers in CORS requests</td></tr>
+        <tr><td><code>ACCESS_TOKEN_LIFETIME</code></td><td>60 minutes</td><td>After 60 min, Bearer token is rejected → user must re-login</td></tr>
+        <tr><td><code>AUTH_HEADER_TYPES</code></td><td>('Bearer',)</td><td>Frontend must prefix token with "Bearer "</td></tr>
+        <tr><td><code>STATIC_URL</code></td><td>/static/</td><td>All static assets loaded from this prefix in templates</td></tr>
+        <tr><td><code>TEMPLATES DIRS</code></td><td>BASE_DIR / 'templates'</td><td>All HTML templates looked up from the root /templates/ folder</td></tr>
+        <tr><td><code>DEBUG</code></td><td>env var (True locally, False on Render)</td><td>In DEBUG=False, Django won't serve static files itself — WhiteNoise takes over</td></tr>
+        <tr><td><code>CACHES</code></td><td>LocMemCache</td><td>OTP for password reset is stored in memory — resets on every server restart</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card" style="border-left:3px solid var(--coral)">
+      <div style="font-size:13px;font-weight:600;color:var(--coral);margin-bottom:8px">⚠️ Security notes</div>
+      <ul class="pointer-list" style="margin:0">
+        <li><strong>SECRET_KEY is hardcoded</strong> — should be moved to an environment variable before production use.</li>
+        <li><strong>Gmail App Password visible in code</strong> — should be in an env var (<code>os.getenv('EMAIL_HOST_PASSWORD')</code>).</li>
+        <li><strong>OTP in LocMemCache</strong> — resets if the Render service restarts. Consider Redis for persistent OTP storage in production.</li>
+        <li><strong>No HTTPS enforcement</strong> — <code>SECURE_SSL_REDIRECT</code> is not set. Render handles HTTPS at the edge.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#1C2030',
+    primaryColor: '#1A1E2A',
+    primaryBorderColor: '#2D3250',
+    lineColor: '#4A5080',
+    secondaryColor: '#2A2E40',
+    tertiaryColor: '#1C2030',
+    primaryTextColor: '#E8EAF0',
+    secondaryTextColor: '#B0B8D0',
+    edgeLabelBackground: '#1C2030',
+    fontFamily: 'DM Sans, system-ui, sans-serif',
+    fontSize: '13px',
+    actorBkg: '#1A1E2A',
+    actorBorder: '#2D3250',
+    actorTextColor: '#E8EAF0',
+    noteBkgColor: '#2A2E40',
+    noteTextColor: '#B0B8D0',
+  },
+  sequence: { useMaxWidth: true, boxMargin: 10, mirrorActors: false },
+  flowchart: { useMaxWidth: true, padding: 16 },
+});
+
+// Sidebar active scroll tracking
+const sections = document.querySelectorAll('.section, .hero');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navItems.forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + current) n.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EaseMyCollab — Technical Documentation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --bg: #0D0F12;
+    --bg2: #151820;
+    --bg3: #1C2030;
+    --card: #1A1E2A;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #E8EAF0;
+    --muted: #7A8099;
+    --accent: #5B7CFA;
+    --accent2: #A78BFA;
+    --green: #34D399;
+    --amber: #FBBF24;
+    --coral: #FB7185;
+    --teal: #2DD4BF;
+    --blue-dim: rgba(91,124,250,0.12);
+    --purple-dim: rgba(167,139,250,0.12);
+    --green-dim: rgba(52,211,153,0.1);
+    --coral-dim: rgba(251,113,133,0.1);
+    --amber-dim: rgba(251,191,36,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 260px; background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 100;
+    padding: 0 0 40px;
+  }
+  .sidebar-logo {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar-logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+  }
+  .sidebar-logo p { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav-section { padding: 6px 16px 2px; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; margin-top: 12px; }
+  .nav-item {
+    display: block; padding: 7px 24px; font-size: 13px; color: var(--muted);
+    text-decoration: none; border-radius: 0;
+    transition: all 0.15s; border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--blue-dim); }
+
+  /* ── MAIN ── */
+  .main { margin-left: 260px; padding: 60px 64px; max-width: 1100px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 80px; scroll-margin-top: 40px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700;
+    color: var(--text); letter-spacing: -0.5px;
+  }
+  .section-header .badge {
+    font-size: 10px; padding: 3px 8px; border-radius: 4px;
+    font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    background: var(--blue-dim); color: var(--accent); border: 1px solid rgba(91,124,250,0.2);
+    margin-left: auto;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600;
+    color: var(--text); margin: 28px 0 12px; letter-spacing: -0.2px;
+  }
+  h4 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 20px 0 8px; letter-spacing: 0.3px; text-transform: uppercase; }
+
+  p { color: #B0B8D0; margin-bottom: 12px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card-sm { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+
+  /* ── MODULES ── */
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .module-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .module-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .module-card.blue::before { background: var(--accent); }
+  .module-card.purple::before { background: var(--accent2); }
+  .module-card.green::before { background: var(--green); }
+  .module-card.coral::before { background: var(--coral); }
+  .module-card.amber::before { background: var(--amber); }
+
+  .module-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; letter-spacing: 0.5px;
+  }
+  .tag-blue { background: var(--blue-dim); color: var(--accent); }
+  .tag-purple { background: var(--purple-dim); color: var(--accent2); }
+  .tag-green { background: var(--green-dim); color: var(--green); }
+  .tag-coral { background: var(--coral-dim); color: var(--coral); }
+  .tag-amber { background: var(--amber-dim); color: var(--amber); }
+
+  .module-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .module-card p { font-size: 13px; margin-bottom: 12px; }
+
+  /* ── POINTER LISTS ── */
+  .pointer-list { list-style: none; margin: 0 0 16px; padding: 0; }
+  .pointer-list li {
+    display: flex; gap: 10px; padding: 7px 0;
+    border-bottom: 1px solid var(--border); font-size: 13px; color: #B0B8D0;
+    align-items: flex-start;
+  }
+  .pointer-list li:last-child { border-bottom: none; }
+  .pointer-list li::before {
+    content: '→'; color: var(--accent); font-size: 12px; margin-top: 2px; flex-shrink: 0;
+  }
+  .pointer-list strong { color: var(--text); font-weight: 500; }
+
+  /* ── API ENDPOINTS ── */
+  .endpoint {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+  }
+  .endpoint-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .endpoint-header:hover { background: rgba(255,255,255,0.03); }
+  .method {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 4px; letter-spacing: 0.5px; min-width: 48px; text-align: center;
+  }
+  .method.get  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .method.post { background: var(--blue-dim);  color: var(--accent); border: 1px solid rgba(91,124,250,0.2); }
+  .method.del  { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(251,113,133,0.2); }
+
+  .endpoint-path {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text);
+    flex: 1;
+  }
+  .endpoint-desc { font-size: 12px; color: var(--muted); }
+  .lock-icon { font-size: 11px; color: var(--amber); padding: 2px 7px; background: var(--amber-dim); border-radius: 4px; white-space: nowrap; }
+
+  .endpoint-body {
+    padding: 0 18px 16px; display: none;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .endpoint-body.open { display: block; }
+
+  /* ── MERMAID ── */
+  .diagram-wrap {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px 24px; margin: 16px 0 28px;
+    overflow-x: auto;
+  }
+  .diagram-wrap .mermaid { display: flex; justify-content: center; }
+
+  /* ── CODE ── */
+  code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--teal);
+  }
+  pre {
+    background: #0A0C10; border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 12px 0 20px;
+  }
+  pre code { background: none; padding: 0; color: #B0D4FF; font-size: 12px; line-height: 1.7; }
+
+  /* ── FLOW TABLES ── */
+  .flow-table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  .flow-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border2); }
+  .flow-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: #B0B8D0; vertical-align: top; }
+  .flow-table tr:last-child td { border-bottom: none; }
+  .flow-table td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; }
+  .flow-table code { font-size: 11px; }
+
+  /* ── STATUS BADGES ── */
+  .status { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.4px; }
+  .status-pending  { background: var(--amber-dim); color: var(--amber); }
+  .status-accepted { background: var(--green-dim);  color: var(--green); }
+  .status-rejected { background: var(--coral-dim);  color: var(--coral); }
+  .status-active   { background: var(--blue-dim);   color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 60px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 64px;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .hero h1 {
+    font-family: 'Syne', sans-serif; font-size: 44px; font-weight: 700;
+    letter-spacing: -1.5px; color: var(--text); line-height: 1.1; margin-bottom: 18px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+  .hero-meta { display: flex; gap: 24px; margin-top: 28px; }
+  .meta-chip {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--muted);
+  }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* ── SCROLL BEHAVIOR ── */
+  html { scroll-behavior: smooth; }
+
+  /* ── DFD FLOW ── */
+  .dfd-flow {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 0; margin: 16px 0;
+  }
+  .dfd-node {
+    padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .dfd-arrow { padding: 0 6px; color: var(--muted); font-size: 14px; }
+  .dfd-n-blue   { background: var(--blue-dim);   color: var(--accent);  border: 1px solid rgba(91,124,250,0.25); }
+  .dfd-n-green  { background: var(--green-dim);  color: var(--green);   border: 1px solid rgba(52,211,153,0.25); }
+  .dfd-n-purple { background: var(--purple-dim); color: var(--accent2); border: 1px solid rgba(167,139,250,0.25); }
+  .dfd-n-amber  { background: var(--amber-dim);  color: var(--amber);   border: 1px solid rgba(251,191,36,0.25); }
+  .dfd-n-coral  { background: var(--coral-dim);  color: var(--coral);   border: 1px solid rgba(251,113,133,0.25); }
+  .dfd-n-gray   { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border2); }
+
+  /* ── ER highlight ── */
+  .er-field { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .er-field:last-child { border-bottom: none; }
+  .er-field .fname { color: var(--text); font-family: 'IBM Plex Mono', monospace; }
+  .er-field .ftype { color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .er-field .fpk   { color: var(--amber); font-size: 10px; font-weight: 600; background: var(--amber-dim); padding: 1px 5px; border-radius: 3px; }
+  .er-field .ffk   { color: var(--teal); font-size: 10px; font-weight: 600; background: rgba(45,212,191,0.1); padding: 1px 5px; border-radius: 3px; }
+
+  .er-table {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+  }
+  .er-table-header {
+    padding: 10px 16px; background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .er-table-header .tname { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
+  .er-table-body { padding: 10px 16px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>EaseMyCollab</h1>
+    <p>Technical Docs v1.0</p>
+  </div>
+
+  <span class="nav-section">Overview</span>
+  <a class="nav-item active" href="#overview">Project Overview</a>
+  <a class="nav-item" href="#architecture">System Architecture</a>
+
+  <span class="nav-section">Data</span>
+  <a class="nav-item" href="#er-diagram">ER Diagram</a>
+  <a class="nav-item" href="#models">Model Details</a>
+
+  <span class="nav-section">Modules</span>
+  <a class="nav-item" href="#accounts">Accounts Module</a>
+  <a class="nav-item" href="#campaigns">Campaigns Module</a>
+  <a class="nav-item" href="#collaborations">Collaborations Module</a>
+  <a class="nav-item" href="#brands">Brands Module</a>
+  <a class="nav-item" href="#influencers">Influencers Module</a>
+
+  <span class="nav-section">APIs</span>
+  <a class="nav-item" href="#api-auth">Auth APIs</a>
+  <a class="nav-item" href="#api-campaigns">Campaign APIs</a>
+  <a class="nav-item" href="#api-collaborations">Collaboration APIs</a>
+  <a class="nav-item" href="#api-profiles">Profile APIs</a>
+
+  <span class="nav-section">Flows</span>
+  <a class="nav-item" href="#dfd-auth">Auth Flow DFD</a>
+  <a class="nav-item" href="#dfd-campaign">Campaign DFD</a>
+  <a class="nav-item" href="#dfd-review">Review DFD</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero" id="overview">
+    <div class="hero-eyebrow">Documentation</div>
+    <h1>Ease<span>MyCollab</span></h1>
+    <p class="hero-sub">A Django REST Framework platform connecting Brands and Influencers for campaign collaboration, application management, and mutual review.</p>
+    <div class="hero-meta">
+      <span class="meta-chip"><span class="meta-dot" style="background:var(--green)"></span>Django 5.x + DRF</span>
+      <span class="meta-chip"><span class="meta-dot" style="background:var(--accent)"></span>JWT Auth</span>
+      <span class="meta-chip"><span class="meta-dot" style="background:var(--accent2)"></span>SQLite / PostgreSQL</span>
+      <span class="meta-chip"><span class="meta-dot" style="background:var(--amber)"></span>5 Core Modules</span>
+    </div>
+  </div>
+
+  <!-- ── SYSTEM ARCHITECTURE ── -->
+  <section class="section" id="architecture">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🏗️</div>
+      <h2>System Architecture</h2>
+      <span class="badge">High-Level</span>
+    </div>
+
+    <p>EaseMyCollab is structured as a Django monolith with 5 distinct apps. The frontend is served via Django templates and the API layer is built with Django REST Framework. JWT tokens handle stateless authentication.</p>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+graph TB
+  subgraph CLIENT ["Client Layer"]
+    B["Browser / Templates"]
+    API_CLIENT["REST API Client"]
+  end
+
+  subgraph AUTH ["Auth Layer"]
+    JWT["JWT Middleware\n(simplejwt)"]
+  end
+
+  subgraph APPS ["Django Apps"]
+    ACC["accounts\n(User, Auth)"]
+    CAM["campaigns\n(Campaign, Application, Review)"]
+    COL["collaborations\n(Collaboration)"]
+    BRD["brands\n(BrandProfile)"]
+    INF["influencers\n(InfluencerProfile)"]
+  end
+
+  subgraph DB ["Data Layer"]
+    SQLITE[("SQLite DB")]
+    SIGNALS["Django Signals\n(auto profile creation)"]
+  end
+
+  subgraph INFRA ["Infrastructure"]
+    STATIC["Static Files (WhiteNoise)"]
+    MEDIA["Media Files /media/"]
+    EMAIL["Email Backend\n(SMTP / Cache OTP)"]
+  end
+
+  B --> JWT
+  API_CLIENT --> JWT
+  JWT --> ACC & CAM & COL & BRD & INF
+  ACC --> SIGNALS --> BRD & INF
+  ACC & CAM & COL & BRD & INF --> SQLITE
+  ACC --> EMAIL
+  B --> STATIC & MEDIA
+
+  style CLIENT fill:#1A1E2A,stroke:#2D3250,color:#E8EAF0
+  style AUTH fill:#1A2A1E,stroke:#2D5032,color:#E8EAF0
+  style APPS fill:#1A1E2A,stroke:#2D3250,color:#E8EAF0
+  style DB fill:#1A1A2A,stroke:#2D2D50,color:#E8EAF0
+  style INFRA fill:#2A1A1A,stroke:#50302D,color:#E8EAF0
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="module-tag tag-blue">Auth Strategy</div>
+        <div style="font-size:13px;margin-top:6px;color:#B0B8D0">
+          JWT via <code>djangorestframework-simplejwt</code>. Access + Refresh token pair issued on login. Refresh tokens enable session extension without re-login.
+        </div>
+      </div>
+      <div class="card-sm">
+        <div class="module-tag tag-green">Signal-Driven Profiles</div>
+        <div style="font-size:13px;margin-top:6px;color:#B0B8D0">
+          On User creation, a <code>post_save</code> signal auto-creates either a <code>BrandProfile</code> or <code>InfluencerProfile</code> based on role.
+        </div>
+      </div>
+      <div class="card-sm">
+        <div class="module-tag tag-purple">Role-Based Access</div>
+        <div style="font-size:13px;margin-top:6px;color:#B0B8D0">
+          All protected endpoints check <code>request.user.role</code>. Only brands create campaigns; only influencers apply. Reviews require accepted collaboration status.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ER DIAGRAM ── -->
+  <section class="section" id="er-diagram">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-dim)">🗄️</div>
+      <h2>ER Diagram</h2>
+      <span class="badge">Database</span>
+    </div>
+    <p>The data model spans 6 tables with 5 relationships. The central pivot is the <code>Application</code> table — connecting Campaigns to Influencers, and then branching into Collaborations and Reviews.</p>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+erDiagram
+  USER {
+    int id PK
+    string username
+    string email
+    string password_hash
+    string role
+    string phone
+  }
+  BRANDPROFILE {
+    int id PK
+    int user_id FK
+    string name
+    string industry
+    string website
+    string bio
+    string instagram_url
+    string youtube_url
+  }
+  INFLUENCERPROFILE {
+    int id PK
+    int user_id FK
+    string full_name
+    string niche
+    string bio
+    string instagram_url
+    string youtube_url
+  }
+  CAMPAIGN {
+    int id PK
+    int brand_id FK
+    string title
+    string description
+    string status
+    date deadline
+    string budget_range
+    datetime created_at
+  }
+  APPLICATION {
+    int id PK
+    int campaign_id FK
+    int influencer_id FK
+    string status
+    string message
+    datetime applied_at
+  }
+  COLLABORATION {
+    int id PK
+    int application_id FK
+    string status
+    string terms
+    datetime started_at
+  }
+  REVIEW {
+    int id PK
+    int application_id FK
+    int reviewer_id FK
+    int reviewee_id FK
+    int rating
+    string comment
+    datetime created_at
+  }
+
+  USER ||--o| BRANDPROFILE : "has (brand role)"
+  USER ||--o| INFLUENCERPROFILE : "has (influencer role)"
+  BRANDPROFILE ||--o{ CAMPAIGN : "creates"
+  INFLUENCERPROFILE ||--o{ APPLICATION : "submits"
+  CAMPAIGN ||--o{ APPLICATION : "receives"
+  APPLICATION ||--o| COLLABORATION : "becomes"
+  APPLICATION ||--o| REVIEW : "gets reviewed"
+  USER ||--o{ REVIEW : "reviewer"
+  USER ||--o{ REVIEW : "reviewee"
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODEL DETAILS ── -->
+  <section class="section" id="models">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">📦</div>
+      <h2>Model Details</h2>
+      <span class="badge">Schema</span>
+    </div>
+    <p>Field-by-field breakdown of every database model with types and constraints.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">accounts_user</span><span class="module-tag tag-blue" style="margin:0">AbstractUser</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">username</span><span class="ftype">CharField(150)</span></div>
+          <div class="er-field"><span class="fname">email</span><span class="ftype">EmailField (unique)</span></div>
+          <div class="er-field"><span class="fname">password</span><span class="ftype">CharField (hashed)</span></div>
+          <div class="er-field"><span class="fname">role</span><span class="ftype">CharField — 'brand'|'influencer'</span></div>
+          <div class="er-field"><span class="fname">phone</span><span class="ftype">CharField(15, blank)</span></div>
+          <div class="er-field"><span class="fname">date_joined</span><span class="ftype">DateTimeField (auto)</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">brands_brandprofile</span><span class="module-tag tag-green" style="margin:0">1:1 User</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">user_id</span><span class="ftype">FK → User <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">name</span><span class="ftype">CharField(255)</span></div>
+          <div class="er-field"><span class="fname">industry</span><span class="ftype">CharField(255)</span></div>
+          <div class="er-field"><span class="fname">website</span><span class="ftype">URLField (blank)</span></div>
+          <div class="er-field"><span class="fname">logo</span><span class="ftype">ImageField (upload_to=logos/)</span></div>
+          <div class="er-field"><span class="fname">bio</span><span class="ftype">TextField (blank)</span></div>
+          <div class="er-field"><span class="fname">instagram_url / youtube_url</span><span class="ftype">URLField</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">influencers_influencerprofile</span><span class="module-tag tag-purple" style="margin:0">1:1 User</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">user_id</span><span class="ftype">FK → User <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">full_name</span><span class="ftype">CharField(255)</span></div>
+          <div class="er-field"><span class="fname">niche</span><span class="ftype">CharField(255)</span></div>
+          <div class="er-field"><span class="fname">bio</span><span class="ftype">TextField (blank)</span></div>
+          <div class="er-field"><span class="fname">profile_pic</span><span class="ftype">ImageField (upload_to=profiles/)</span></div>
+          <div class="er-field"><span class="fname">instagram_url / youtube_url</span><span class="ftype">URLField</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">campaigns_campaign</span><span class="module-tag tag-amber" style="margin:0">Core Entity</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">brand_id</span><span class="ftype">FK → BrandProfile <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">title</span><span class="ftype">CharField(255)</span></div>
+          <div class="er-field"><span class="fname">description</span><span class="ftype">TextField</span></div>
+          <div class="er-field"><span class="fname">status</span><span class="ftype">CharField(50) default='open'</span></div>
+          <div class="er-field"><span class="fname">deadline</span><span class="ftype">DateField</span></div>
+          <div class="er-field"><span class="fname">budget_range</span><span class="ftype">CharField(100)</span></div>
+          <div class="er-field"><span class="fname">created_at</span><span class="ftype">DateTimeField (auto)</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">campaigns_application</span><span class="module-tag tag-coral" style="margin:0">Bridge Table</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">campaign_id</span><span class="ftype">FK → Campaign <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">influencer_id</span><span class="ftype">FK → InfluencerProfile <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">status</span><span class="ftype">'pending' | 'accepted' | 'rejected'</span></div>
+          <div class="er-field"><span class="fname">message</span><span class="ftype">TextField (blank)</span></div>
+          <div class="er-field"><span class="fname">applied_at</span><span class="ftype">DateTimeField (auto)</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">campaigns_review</span><span class="module-tag tag-green" style="margin:0">1:1 Application</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">application_id</span><span class="ftype">OneToOneFK → Application <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">reviewer_id</span><span class="ftype">FK → User <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">reviewee_id</span><span class="ftype">FK → User <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">rating</span><span class="ftype">IntegerField (1–5 validated)</span></div>
+          <div class="er-field"><span class="fname">comment</span><span class="ftype">TextField (blank)</span></div>
+          <div class="er-field"><span class="fname">created_at</span><span class="ftype">DateTimeField (auto)</span></div>
+        </div>
+      </div>
+
+      <div class="er-table">
+        <div class="er-table-header"><span class="tname">collaborations_collaboration</span><span class="module-tag tag-blue" style="margin:0">1:1 Application</span></div>
+        <div class="er-table-body">
+          <div class="er-field"><span class="fname">id</span><span class="ftype">AutoField <span class="fpk">PK</span></span></div>
+          <div class="er-field"><span class="fname">application_id</span><span class="ftype">OneToOneFK → Application <span class="ffk">FK</span></span></div>
+          <div class="er-field"><span class="fname">status</span><span class="ftype">CharField — 'active' etc.</span></div>
+          <div class="er-field"><span class="fname">terms</span><span class="ftype">TextField</span></div>
+          <div class="er-field"><span class="fname">started_at</span><span class="ftype">DateTimeField (auto)</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ACCOUNTS MODULE ── -->
+  <section class="section" id="accounts">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">👤</div>
+      <h2>Accounts Module</h2>
+      <span class="badge">Module</span>
+    </div>
+    <p>Handles all user lifecycle operations: registration, login, password reset, and profile read/write. Acts as the central identity service for both Brand and Influencer users.</p>
+
+    <h3>What this module does</h3>
+    <ul class="pointer-list">
+      <li><strong>Custom User Model</strong> extends AbstractUser, adding <code>role</code> (brand/influencer) and <code>phone</code> fields. Email is enforced as unique.</li>
+      <li><strong>Signal-driven profile creation</strong> — on User save, Django signals fire automatically to create either a BrandProfile or InfluencerProfile depending on the role.</li>
+      <li><strong>JWT-based login</strong> — credentials are validated with Django's <code>authenticate()</code>, and a simplejwt access + refresh token pair is returned.</li>
+      <li><strong>Forgot Password</strong> — generates a 6-digit OTP, caches it for 5 minutes under key <code>reset_otp_{email}</code>, and emails it via SMTP.</li>
+      <li><strong>Reset Password</strong> — validates OTP from cache, sets new password using <code>set_password()</code>, clears OTP from cache.</li>
+      <li><strong>Unified Profile API</strong> — serves both Brand and Influencer profile data from a single endpoint based on <code>request.user.role</code>. Also computes average rating from the Review table.</li>
+      <li><strong>Profile update</strong> — POST to the same profile endpoint updates the respective profile fields (name, bio, industry, social URLs).</li>
+    </ul>
+
+    <h3>How data flows (Registration)</h3>
+    <div class="dfd-flow">
+      <div class="dfd-node dfd-n-gray">Client POSTs credentials</div><div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-blue">RegisterView validates input</div><div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-amber">Checks username/email uniqueness</div><div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-green">create_user() saves hashed password</div><div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-purple">post_save signal fires → creates BrandProfile or InfluencerProfile</div>
+    </div>
+
+    <h3>Key logic in ProfileView</h3>
+    <ul class="pointer-list">
+      <li><strong>Optional <code>?user_id=</code> query param</strong> — if provided, returns another user's public profile. Otherwise returns the authenticated user's own profile.</li>
+      <li><strong>is_owner flag</strong> — set to True only when viewing own profile, controls whether the Edit button appears in frontend templates.</li>
+      <li><strong>Ratings aggregation</strong> — queries <code>Review.objects.filter(reviewee=target_user)</code>, aggregates average rating with <code>Avg('rating')</code>, fetches latest 5 reviews.</li>
+      <li><strong>Graceful degradation</strong> — all review logic wrapped in try/except so profile still loads even if Review table doesn't exist yet.</li>
+    </ul>
+
+    <h3>Files</h3>
+    <table class="flow-table">
+      <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>models.py</code></td><td>Custom User model + post_save signal handlers for auto-profile creation</td></tr>
+        <tr><td><code>serializers.py</code></td><td>RegisterSerializer (ModelSerializer) and LoginSerializer (Serializer with write-only password)</td></tr>
+        <tr><td><code>views.py</code></td><td>RegisterView, LoginView, ProfileView, ForgotPasswordView, ResetPasswordView</td></tr>
+        <tr><td><code>views_frontend.py</code></td><td>Renders login, register, home, and profile HTML templates</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── CAMPAIGNS MODULE ── -->
+  <section class="section" id="campaigns">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">📣</div>
+      <h2>Campaigns Module</h2>
+      <span class="badge">Module</span>
+    </div>
+    <p>The core business module. Manages the full campaign lifecycle from creation to application management, status updates, and post-collaboration reviews.</p>
+
+    <h3>What this module does</h3>
+    <ul class="pointer-list">
+      <li><strong>Campaign creation</strong> — only users with <code>role=brand</code> can create campaigns. Brand profile is automatically linked from <code>request.user.brandprofile</code>.</li>
+      <li><strong>Campaign listing</strong> — public endpoint (no auth required) returning all campaigns with full field serialization.</li>
+      <li><strong>My campaigns</strong> — brand-specific endpoint filtering campaigns by <code>brand=request.user.brandprofile</code>.</li>
+      <li><strong>Delete campaign</strong> — verifies ownership before deleting to prevent unauthorized deletion.</li>
+      <li><strong>Apply to campaign</strong> — influencer-only. Checks role, fetches/creates InfluencerProfile using get_or_create for safety, prevents duplicate applications with <code>Application.objects.filter().exists()</code> check.</li>
+      <li><strong>View applicants</strong> — brands can see all applications for a given campaign ID. ApplicationSerializer enriches output with influencer name and user ID.</li>
+      <li><strong>Update application status</strong> — accepts 'accepted' or 'rejected' values, updates the Application.status field and saves.</li>
+      <li><strong>Post review</strong> — only allowed if Application.status is 'accepted'. Prevents duplicate reviews (same reviewer + application combo). Reviewer determines reviewee: if brand is reviewing, reviewee is the influencer's user, and vice versa.</li>
+    </ul>
+
+    <h3>Application Status State Machine</h3>
+    <div class="dfd-flow" style="flex-wrap:wrap;gap:12px">
+      <div class="dfd-node dfd-n-amber"><span class="status status-pending">pending</span>&nbsp; Default on apply</div>
+      <div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-green"><span class="status status-accepted">accepted</span>&nbsp; Brand approves</div>
+      <div class="dfd-arrow">or</div>
+      <div class="dfd-node dfd-n-coral"><span class="status status-rejected">rejected</span>&nbsp; Brand rejects</div>
+      <div class="dfd-arrow">→</div>
+      <div class="dfd-node dfd-n-blue"><span class="status status-active">review enabled</span>&nbsp; After accepted</div>
+    </div>
+
+    <h3>How data flows (Application)</h3>
+    <ul class="pointer-list">
+      <li><strong>Role guard</strong> — returns 400 immediately if <code>request.user.role != 'influencer'</code>.</li>
+      <li><strong>Profile safety</strong> — uses <code>get_or_create</code> on InfluencerProfile to avoid 404 if profile doesn't exist yet.</li>
+      <li><strong>Duplicate guard</strong> — filters by campaign + influencer combo before creating new application.</li>
+      <li><strong>Creation</strong> — always sets status='pending' explicitly regardless of any request payload.</li>
+    </ul>
+
+    <h3>Review Logic (critical)</h3>
+    <ul class="pointer-list">
+      <li><strong>Mutual reviews</strong> — both brand and influencer can review each other for the same collaboration. Each review is tied to one application.</li>
+      <li><strong>Reviewee determination</strong> — if <code>request.user == application.campaign.brand.user</code> → reviewee is influencer's user. Otherwise → reviewee is brand's user.</li>
+      <li><strong>Duplicate prevention</strong> — checks <code>Review.objects.filter(application=application, reviewer=request.user).exists()</code> before creating.</li>
+      <li><strong>Status gate</strong> — reviews only allowed when <code>application.status == 'accepted'</code>.</li>
+    </ul>
+
+    <h3>Files</h3>
+    <table class="flow-table">
+      <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>models.py</code></td><td>Campaign, Application, and Review models with validators</td></tr>
+        <tr><td><code>serializers.py</code></td><td>CampaignSerializer (all fields, brand optional) and ApplicationSerializer with nested influencer name/ID fields</td></tr>
+        <tr><td><code>views.py</code></td><td>7 API views: Create, List, MyCampaigns, Delete, Apply, ViewApplicants, InfluencerApplications, UpdateStatus, PostReview</td></tr>
+        <tr><td><code>views_frontend.py</code></td><td>Renders create-campaign HTML template</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── COLLABORATIONS MODULE ── -->
+  <section class="section" id="collaborations">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">🤝</div>
+      <h2>Collaborations Module</h2>
+      <span class="badge">Module</span>
+    </div>
+    <p>A thin but important module that formalizes an accepted application into an active collaboration record. Currently provides basic accept + duplicate-guard logic.</p>
+
+    <h3>What this module does</h3>
+    <ul class="pointer-list">
+      <li><strong>Accept application</strong> — creates a <code>Collaboration</code> record pointing to an Application. Sets status='active' and fills default terms.</li>
+      <li><strong>Duplicate guard</strong> — uses <code>Collaboration.objects.filter(application_id=application_id).exists()</code> to prevent creating the same collaboration twice.</li>
+      <li><strong>1:1 relationship with Application</strong> — enforced at model level with OneToOneField, guaranteeing only one collaboration per application.</li>
+    </ul>
+
+    <h3>Design notes</h3>
+    <ul class="pointer-list">
+      <li><strong>Thin module by design</strong> — the Collaboration model exists as a separate concept to allow future expansion (add contract terms, milestones, payment tracking) without polluting the Application model.</li>
+      <li><strong>Auth currently commented out</strong> — <code>permission_classes</code> is disabled on AcceptApplicationView. Should be re-enabled in production to restrict to brand users only.</li>
+      <li><strong>Standard terms hardcoded</strong> — <code>terms="Standard terms"</code> is a placeholder; real implementation would accept terms from request data.</li>
+    </ul>
+
+    <h3>Files</h3>
+    <table class="flow-table">
+      <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>models.py</code></td><td>Collaboration model with OneToOne link to Application</td></tr>
+        <tr><td><code>serializers.py</code></td><td>CollaborationSerializer — minimal field exposure</td></tr>
+        <tr><td><code>views.py</code></td><td>AcceptApplicationView — duplicate guard + record creation</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── BRANDS MODULE ── -->
+  <section class="section" id="brands">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">🏢</div>
+      <h2>Brands Module</h2>
+      <span class="badge">Module</span>
+    </div>
+    <p>Manages brand profile data. Provides create/update for brand profile fields including industry, bio, website, and social media links.</p>
+
+    <h3>What this module does</h3>
+    <ul class="pointer-list">
+      <li><strong>BrandProfile CRUD</strong> — POST to create or update a brand's profile fields. Uses <code>get_or_create</code> to safely handle first-time profile setup.</li>
+      <li><strong>Auto-populated from signals</strong> — BrandProfile is auto-created (with username as name) when a brand User registers, via accounts' post_save signal. This view is for subsequent updates.</li>
+      <li><strong>Social link storage</strong> — supports instagram_url, twitter_url, facebook_url, and youtube_url as URLFields.</li>
+      <li><strong>Logo upload</strong> — ImageField with upload path <code>logos/</code> under MEDIA_ROOT.</li>
+    </ul>
+
+    <h3>Key design point</h3>
+    <ul class="pointer-list">
+      <li><strong>Profile served through ProfileView in accounts</strong> — the BrandProfileView in this module is supplementary. The primary profile read/write endpoint (<code>/api/profile/</code>) lives in the accounts app and handles both brand and influencer profiles uniformly.</li>
+    </ul>
+  </section>
+
+  <!-- ── INFLUENCERS MODULE ── -->
+  <section class="section" id="influencers">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-dim)">🎤</div>
+      <h2>Influencers Module</h2>
+      <span class="badge">Module</span>
+    </div>
+    <p>Manages influencer profile data including niche, bio, and social links. Mirrors the brands module for the influencer side.</p>
+
+    <h3>What this module does</h3>
+    <ul class="pointer-list">
+      <li><strong>InfluencerProfile CRUD</strong> — GET to read (own or any user's profile via ?user_id), POST to update fields like full_name, niche, bio, social URLs.</li>
+      <li><strong>Multi-user profile lookup</strong> — InfluencerProfileView supports fetching another user's profile by user_id. If not found as influencer, falls back to checking BrandProfile.</li>
+      <li><strong>is_owner flag</strong> — returned as False when viewing someone else's profile, so the frontend can hide the Edit button.</li>
+      <li><strong>Auto-created on registration</strong> — just like brands, InfluencerProfile is auto-created via post_save signal in accounts.</li>
+    </ul>
+
+    <h3>Key design point</h3>
+    <ul class="pointer-list">
+      <li><strong>Primary profile endpoint is in accounts</strong> — <code>/api/profile/</code> from AccountsModule handles influencer profiles too. The views in this module are secondary/utility views.</li>
+      <li><strong>Profile pic uploads</strong> — ImageField with path <code>profiles/</code> under MEDIA_ROOT.</li>
+    </ul>
+  </section>
+
+  <!-- ── AUTH APIs ── -->
+  <section class="section" id="api-auth">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🔐</div>
+      <h2>Auth APIs</h2>
+      <span class="badge">REST Endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/register/</span>
+        <span class="endpoint-desc">Register a new user</span>
+      </div>
+      <div class="endpoint-body">
+        <h4>Request Body</h4>
+        <pre><code>{ "username": "mynick", "email": "me@brand.com", "password": "pass123", "role": "brand" }</code></pre>
+        <h4>What happens</h4>
+        <ul class="pointer-list">
+          <li>Checks username and email uniqueness separately, returns specific 400 errors for each</li>
+          <li>Creates User with hashed password via <code>create_user()</code></li>
+          <li>post_save signal fires → auto-creates BrandProfile or InfluencerProfile</li>
+          <li>Returns 201 on success</li>
+        </ul>
+        <h4>Response (success)</h4>
+        <pre><code>{ "message": "Registration successful" }</code></pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/login/</span>
+        <span class="endpoint-desc">Login and receive JWT tokens</span>
+      </div>
+      <div class="endpoint-body">
+        <h4>Request Body</h4>
+        <pre><code>{ "username": "mynick", "password": "pass123" }</code></pre>
+        <h4>What happens</h4>
+        <ul class="pointer-list">
+          <li>Validates via LoginSerializer, runs Django's <code>authenticate()</code></li>
+          <li>On success, generates simplejwt RefreshToken and returns access + refresh tokens</li>
+          <li>Returns 401 on invalid credentials</li>
+        </ul>
+        <h4>Response</h4>
+        <pre><code>{ "message": "Login successful", "access": "eyJ...", "refresh": "eyJ...", "user": { "id": 1, "username": "mynick", "role": "brand" } }</code></pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/forgot-password/</span>
+        <span class="endpoint-desc">Send OTP for password reset</span>
+      </div>
+      <div class="endpoint-body">
+        <h4>What happens</h4>
+        <ul class="pointer-list">
+          <li>Checks if email exists in the database, returns 404 if not</li>
+          <li>Generates random 6-digit OTP, stores in Django cache under <code>reset_otp_{email}</code> for 5 minutes</li>
+          <li>Sends email via SMTP configured in settings</li>
+        </ul>
+        <pre><code>{ "email": "me@brand.com" }</code></pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/reset-password/</span>
+        <span class="endpoint-desc">Reset password using OTP</span>
+      </div>
+      <div class="endpoint-body">
+        <h4>What happens</h4>
+        <ul class="pointer-list">
+          <li>Retrieves stored OTP from cache, compares with submitted OTP</li>
+          <li>Returns 400 if OTP is invalid or expired (TTL exceeded)</li>
+          <li>Calls <code>user.set_password(new_password)</code> and saves</li>
+          <li>Deletes OTP from cache to prevent reuse</li>
+        </ul>
+        <pre><code>{ "email": "me@brand.com", "otp": "123456", "new_password": "newPass!" }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CAMPAIGN APIs ── -->
+  <section class="section" id="api-campaigns">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">📣</div>
+      <h2>Campaign APIs</h2>
+      <span class="badge">REST Endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/api/campaigns/</span>
+        <span class="endpoint-desc">List all campaigns — public</span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>No authentication required — fully public endpoint</li>
+          <li>Returns all campaigns with all fields via CampaignSerializer</li>
+          <li>No pagination currently implemented</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/create-campaign/</span>
+        <span class="endpoint-desc">Create a campaign <span class="lock-icon">🔒 brand only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <h4>Request Body</h4>
+        <pre><code>{ "title": "Summer Launch", "description": "...", "deadline": "2025-08-01", "budget_range": "10k-20k", "status": "open" }</code></pre>
+        <ul class="pointer-list">
+          <li>Returns 403-equivalent message if user role is not 'brand'</li>
+          <li>brand field is set server-side from <code>BrandProfile.objects.get(user=request.user)</code> — not from request body</li>
+          <li>Returns validation errors from CampaignSerializer if any field is invalid</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/api/my-campaigns/</span>
+        <span class="endpoint-desc">Brand's own campaigns <span class="lock-icon">🔒 brand only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Filters campaigns by <code>brand=request.user.brandprofile</code></li>
+          <li>Returns 400 if non-brand user hits this endpoint</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method del">DEL</span>
+        <span class="endpoint-path">/api/delete-campaign/&lt;id&gt;/</span>
+        <span class="endpoint-desc">Delete a campaign <span class="lock-icon">🔒 owner only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Verifies <code>campaign.brand == request.user.brandprofile</code> before deleting</li>
+          <li>Returns error response if ownership check fails</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/apply/&lt;campaign_id&gt;/</span>
+        <span class="endpoint-desc">Apply to a campaign <span class="lock-icon">🔒 influencer only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Returns 400 if user role is not 'influencer'</li>
+          <li>Uses <code>get_or_create</code> on InfluencerProfile for safety</li>
+          <li>Returns 400 if already applied (duplicate check)</li>
+          <li>Returns 404 if campaign doesn't exist (via get_object_or_404)</li>
+          <li>Creates Application with status='pending'</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/api/applicants/&lt;campaign_id&gt;/</span>
+        <span class="endpoint-desc">View applicants for a campaign <span class="lock-icon">🔒 auth required</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Filters applications by campaign_id</li>
+          <li>Returns influencer_name and influencer_user_id via ApplicationSerializer for frontend profile linking</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/api/influencer/my-applications/</span>
+        <span class="endpoint-desc">Influencer's own applications <span class="lock-icon">🔒 influencer only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Uses <code>select_related('campaign__brand')</code> to avoid N+1 queries</li>
+          <li>Returns campaign title, brand name, brand_user_id (for profile link), status, budget, and applied_at date</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/application/&lt;application_id&gt;/update/</span>
+        <span class="endpoint-desc">Update application status <span class="lock-icon">🔒 auth required</span></span>
+      </div>
+      <div class="endpoint-body">
+        <pre><code>{ "status": "accepted" }  // or "rejected"</code></pre>
+        <ul class="pointer-list">
+          <li>Only allows 'accepted' or 'rejected' as valid status values</li>
+          <li>Returns 400 for any other status string</li>
+          <li>Returns 404 if application_id does not exist</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/post-review/</span>
+        <span class="endpoint-desc">Submit a review <span class="lock-icon">🔒 accepted collab only</span></span>
+      </div>
+      <div class="endpoint-body">
+        <pre><code>{ "application_id": 5, "rating": 4, "comment": "Great collaboration!" }</code></pre>
+        <ul class="pointer-list">
+          <li>Returns 400 if application status is not 'accepted'</li>
+          <li>Returns 400 if reviewer has already submitted a review for this application</li>
+          <li>Determines reviewee automatically based on who is reviewing</li>
+          <li>rating must be 1–5 (enforced by MinValueValidator/MaxValueValidator)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COLLABORATION APIs ── -->
+  <section class="section" id="api-collaborations">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">🤝</div>
+      <h2>Collaboration APIs</h2>
+      <span class="badge">REST Endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/accept-application/&lt;application_id&gt;/</span>
+        <span class="endpoint-desc">Formalize an application into a collaboration</span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Checks if a Collaboration already exists for this application_id — returns error if so</li>
+          <li>Creates Collaboration with status='active' and terms='Standard terms'</li>
+          <li>OneToOne constraint at DB level also prevents duplicates at the data layer</li>
+          <li>Note: auth is currently disabled on this view — should be restricted to brand users in production</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROFILE APIs ── -->
+  <section class="section" id="api-profiles">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--purple-dim)">🧑‍💼</div>
+      <h2>Profile APIs</h2>
+      <span class="badge">REST Endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/api/profile/?user_id=&lt;optional&gt;</span>
+        <span class="endpoint-desc">Get own or another user's profile <span class="lock-icon">🔒 auth required</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Without <code>user_id</code>: returns authenticated user's own profile</li>
+          <li>With <code>user_id</code>: returns that user's public profile data</li>
+          <li>Includes avg_rating, total_reviews, and latest 5 reviews regardless of role</li>
+          <li>is_owner=True only for own profile — controls frontend edit visibility</li>
+        </ul>
+        <h4>Response (Brand)</h4>
+        <pre><code>{ "id": 1, "role": "brand", "is_owner": true, "name": "Acme Co", "industry": "Fashion", "website": "acme.com", "bio": "...", "instagram": "...", "youtube": "...", "avg_rating": 4.5, "total_reviews": 12, "reviews": [...] }</code></pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/api/profile/</span>
+        <span class="endpoint-desc">Update own profile <span class="lock-icon">🔒 auth required</span></span>
+      </div>
+      <div class="endpoint-body">
+        <ul class="pointer-list">
+          <li>Automatically detects whether user is brand or influencer via <code>request.user.role</code></li>
+          <li>Updates only the fields present in request.data (falls back to existing value)</li>
+          <li>Uses <code>get_or_create</code> to safely handle first-time update</li>
+        </ul>
+        <pre><code>{ "name": "New Name", "bio": "Updated bio", "instagram": "https://instagram.com/..." }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AUTH DFD ── -->
+  <section class="section" id="dfd-auth">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--blue-dim)">🔄</div>
+      <h2>Auth Flow — Data Flow Diagram</h2>
+      <span class="badge">DFD</span>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+sequenceDiagram
+  participant C as Client
+  participant R as RegisterView
+  participant DB as Database
+  participant S as Django Signal
+  participant BP as BrandProfile
+  participant IP as InfluencerProfile
+
+  C->>R: POST /api/register/ {username, email, password, role}
+  R->>DB: Check username exists?
+  DB-->>R: Exists/Not
+  alt Username taken
+    R-->>C: 400 Username already taken
+  end
+  R->>DB: Check email exists?
+  DB-->>R: Exists/Not
+  alt Email taken
+    R-->>C: 400 Email already registered
+  end
+  R->>DB: User.objects.create_user(...)
+  DB-->>S: post_save signal fires
+  alt role == brand
+    S->>BP: BrandProfile.objects.create(user, name=username)
+  else role == influencer
+    S->>IP: InfluencerProfile.objects.create(user, full_name=username)
+  end
+  R-->>C: 201 Registration successful
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+sequenceDiagram
+  participant C as Client
+  participant L as LoginView
+  participant A as authenticate()
+  participant JWT as simplejwt
+
+  C->>L: POST /api/login/ {username, password}
+  L->>L: Validate via LoginSerializer
+  L->>A: authenticate(username, password)
+  A-->>L: User object or None
+  alt Invalid credentials
+    L-->>C: 401 Invalid credentials
+  end
+  L->>JWT: RefreshToken.for_user(user)
+  JWT-->>L: refresh token + access token
+  L-->>C: 200 {access, refresh, user{id, username, role}}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CAMPAIGN DFD ── -->
+  <section class="section" id="dfd-campaign">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--amber-dim)">🔄</div>
+      <h2>Campaign & Application Flow — DFD</h2>
+      <span class="badge">DFD</span>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+flowchart TD
+  B[Brand User] -->|POST /api/create-campaign/| CC[CreateCampaignView]
+  CC -->|role != brand?| E1[Error 400]
+  CC -->|Serialize + validate| CS[CampaignSerializer]
+  CS -->|save with brand=BrandProfile| DB[(Campaign table)]
+
+  I[Influencer User] -->|POST /api/apply/:id/| AV[ApplyCampaignView]
+  AV -->|role != influencer?| E2[Error 400]
+  AV -->|get_or_create InfluencerProfile| IP[InfluencerProfile]
+  AV -->|get_object_or_404 Campaign| CAM[Campaign exists?]
+  CAM -->|No| E3[404 Not Found]
+  CAM -->|Yes| DUP{Already applied?}
+  DUP -->|Yes| E4[400 Already applied]
+  DUP -->|No| APP[(Application — status=pending)]
+
+  BRAND[Brand User] -->|POST /api/application/:id/update/| US[UpdateApplicationStatusView]
+  US -->|status = accepted/rejected| APP2[(Application — update status)]
+  US -->|invalid status| E5[400 Invalid status]
+
+  style E1 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E2 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E3 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E4 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E5 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style DB fill:#1A2A1E,stroke:#34D399,color:#34D399
+  style APP fill:#1A2A1E,stroke:#34D399,color:#34D399
+  style APP2 fill:#1A2A1E,stroke:#34D399,color:#34D399
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REVIEW DFD ── -->
+  <section class="section" id="dfd-review">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--green-dim)">🔄</div>
+      <h2>Review Flow — DFD</h2>
+      <span class="badge">DFD</span>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="mermaid">
+flowchart TD
+  U[Any User: Brand or Influencer] -->|POST /api/post-review/| PRV[PostReviewView]
+
+  PRV -->|Find Application by ID| APP{Application exists?}
+  APP -->|No| E1[404 Application not found]
+  APP -->|Yes| ST{Status == accepted?}
+  ST -->|No| E2[400 Can only review accepted collaborations]
+  ST -->|Yes| DUP{Review already exists for this\n reviewer + application?}
+  DUP -->|Yes| E3[400 Review already submitted]
+  DUP -->|No| WHO{Who is reviewing?}
+
+  WHO -->|request.user == campaign.brand.user| REV_I[Reviewee = influencer.user]
+  WHO -->|Otherwise| REV_B[Reviewee = brand.user]
+
+  REV_I --> CREATE[Review.objects.create\napplication, reviewer, reviewee, rating, comment]
+  REV_B --> CREATE
+  CREATE --> DB[(Review table)]
+  DB -->|Shown on profile via avg + latest| PROF[ProfileView aggregation]
+
+  style E1 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E2 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style E3 fill:#2A1A1A,stroke:#FB7185,color:#FB7185
+  style DB fill:#1A2A1E,stroke:#34D399,color:#34D399
+  style PROF fill:#1A1A2A,stroke:#A78BFA,color:#A78BFA
+      </div>
+    </div>
+
+    <h3>End-to-end data lifecycle</h3>
+    <table class="flow-table">
+      <thead><tr><th>Stage</th><th>Who</th><th>Action</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>1. Register</td><td>Brand / Influencer</td><td>POST /api/register/</td><td>User + Profile auto-created</td></tr>
+        <tr><td>2. Login</td><td>Any user</td><td>POST /api/login/</td><td>JWT access + refresh tokens</td></tr>
+        <tr><td>3. Create Campaign</td><td>Brand</td><td>POST /api/create-campaign/</td><td>Campaign saved with brand FK</td></tr>
+        <tr><td>4. Browse Campaigns</td><td>Influencer</td><td>GET /api/campaigns/</td><td>All open campaigns returned</td></tr>
+        <tr><td>5. Apply</td><td>Influencer</td><td>POST /api/apply/:id/</td><td>Application with status=pending</td></tr>
+        <tr><td>6. Review Applications</td><td>Brand</td><td>GET /api/applicants/:campaign_id/</td><td>List of applicants with names</td></tr>
+        <tr><td>7. Accept/Reject</td><td>Brand</td><td>POST /api/application/:id/update/</td><td>Application.status updated</td></tr>
+        <tr><td>8. Formalize</td><td>Brand</td><td>POST /api/accept-application/:id/</td><td>Collaboration record created</td></tr>
+        <tr><td>9. Review</td><td>Brand or Influencer</td><td>POST /api/post-review/</td><td>Review stored, shown on profiles</td></tr>
+        <tr><td>10. View Profile</td><td>Anyone (authenticated)</td><td>GET /api/profile/?user_id=X</td><td>Profile + rating aggregation</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#1C2030',
+    primaryColor: '#1A1E2A',
+    primaryBorderColor: '#2D3250',
+    lineColor: '#4A5080',
+    secondaryColor: '#2A2E40',
+    tertiaryColor: '#1C2030',
+    primaryTextColor: '#E8EAF0',
+    secondaryTextColor: '#B0B8D0',
+    edgeLabelBackground: '#1C2030',
+    fontFamily: 'DM Sans, system-ui, sans-serif',
+    fontSize: '13px',
+    sequenceNumberColor: '#E8EAF0',
+    actorBkg: '#1A1E2A',
+    actorBorder: '#2D3250',
+    actorTextColor: '#E8EAF0',
+    noteBkgColor: '#2A2E40',
+    noteTextColor: '#B0B8D0',
+  },
+  er: { diagramPadding: 24, layoutDirection: 'TB', minEntityWidth: 100, minEntityHeight: 75, entityPadding: 15, useMaxWidth: true },
+  sequence: { useMaxWidth: true, boxMargin: 10, mirrorActors: false },
+  flowchart: { useMaxWidth: true, padding: 16 },
+});
+
+function toggle(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// Sidebar active link tracking
+const sections = document.querySelectorAll('.section, .hero');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+  navItems.forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + current) n.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
