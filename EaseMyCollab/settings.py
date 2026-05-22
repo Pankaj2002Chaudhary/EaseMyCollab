@@ -112,7 +112,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # literally the string "apikey"
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
-DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@email.com'
+DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
