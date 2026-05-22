@@ -97,7 +97,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'pankajchoudhary6643@gmail.com'
-EMAIL_HOST_PASSWORD = 'tord mpul fbxx ijrk' # Pakka check karna ye App Password hai
+# EMAIL_HOST_PASSWORD = 'tord mpul fbxx ijrk' # Pakka check karna ye App Password hai
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'tord mpul fbxx ijrk')
 # 9. STATIC & MEDIA FILES
 # settings.py mein ye update karo
 STATIC_URL = '/static/'  # Shuru mein slash zaroori hai
