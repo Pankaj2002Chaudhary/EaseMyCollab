@@ -4,6 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Campaign
 from .serializers import CampaignSerializer
 from brands.models import BrandProfile
+from rest_framework import status
+from .serializers import CampaignSerializer, CampaignAIGenerateSerializer   # CampaignAIGenerateSerializer add karo
+from .services import generate_campaign_content, CampaignAIGenerationError   # yeh naya line
 class CreateCampaignView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -20,6 +23,32 @@ class CreateCampaignView(APIView):
             return Response({"message": "Campaign created successfully"})
 
         return Response(serializer.errors)
+
+class GenerateCampaignAIView(APIView):
+    """
+    POST /api/generate-campaign-ai/
+    Body: { key_points, brand_name?, category?, platform?, budget? }
+    Brand-only. Sirf title+description generate karta hai, campaign create nahi karta.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role != 'brand':
+            return Response(
+                {"error": "Only brands can generate campaign content"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = CampaignAIGenerateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            content = generate_campaign_content(**serializer.validated_data)
+        except CampaignAIGenerationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+
+        return Response(content, status=status.HTTP_200_OK)
     
 class CampaignListView(APIView):
 

@@ -22,3 +22,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = ['id', 'influencer_name', 'influencer_user_id', 'status', 'applied_at']
+
+# campaigns/serializers.py — input validation for the AI campaign generator
+class CampaignAIGenerateSerializer(serializers.Serializer):
+    key_points = serializers.CharField()   # brand ke 3-4 rough points
+    brand_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    category = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    platform = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    budget = serializers.CharField(max_length=100, required=False, allow_blank=True)

@@ -59,7 +59,6 @@
     color: var(--text-muted);
   }
 
-  /* Form Styling */
   .field-group {
     margin-bottom: 24px;
   }
@@ -137,6 +136,77 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* --- AI Assist panel --- */
+  .ai-panel {
+    background: #f6f4ef;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+
+  .ai-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .ai-panel-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .btn-ai {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #1a1a1a, #3a3a3a);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-ai:hover { opacity: 0.9; }
+  .btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .ai-error {
+    display: none;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #b91c1c;
+  }
+
+  .ai-generated-badge {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #166534;
+    margin: -14px 0 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <div class="campaign-wrap">
@@ -146,6 +216,25 @@
       <p class="card-subtitle">Define your requirements for influencers</p>
     </div>
 
+    <!-- ───────── AI Assist Panel ───────── -->
+    <div class="ai-panel">
+      <div class="ai-panel-title">✨ Generate with AI</div>
+      <div class="ai-panel-sub">Type 3-4 rough points about the campaign — AI will turn them into a full title + detailed description you can edit before posting.</div>
+
+      <div class="field-group" style="margin-bottom: 14px;">
+        <textarea id="ai_key_points" class="field-textarea" style="height: 90px;"
+          placeholder="e.g.&#10;- New skincare serum launch&#10;- Want Instagram reels, 2-3 per influencer&#10;- Audience: women 20-35&#10;- Budget around 30k"></textarea>
+      </div>
+
+      <button class="btn-ai" id="aiGenerateBtn" onclick="generateWithAI()" type="button">
+        <span class="spinner" id="aiSpinner"></span>
+        <span id="aiBtnLabel">✨ Generate with AI</span>
+      </button>
+      <div class="ai-error" id="aiError"></div>
+    </div>
+
+    <div class="ai-generated-badge" id="aiBadge">✓ Drafted by AI — review and edit before publishing</div>
+
     <div class="field-group">
       <label class="field-label">Campaign Title</label>
       <input id="title" class="field-input" placeholder="e.g. Summer Collection 2026">
@@ -153,7 +242,7 @@
 
     <div class="field-group">
       <label class="field-label">Brief Description</label>
-      <textarea id="description" class="field-textarea" placeholder="What are the goals of this collaboration?"></textarea>
+      <textarea id="description" class="field-textarea" style="height: 220px;" placeholder="What are the goals of this collaboration?"></textarea>
     </div>
 
     <div class="field-group">
@@ -175,13 +264,73 @@
 </div>
 
 <script>
+const API_BASE = "https://easemycollab.onrender.com";
+
+async function generateWithAI() {
+    const aiBtn = document.getElementById("aiGenerateBtn");
+    const spinner = document.getElementById("aiSpinner");
+    const label = document.getElementById("aiBtnLabel");
+    const errorBox = document.getElementById("aiError");
+    errorBox.style.display = "none";
+
+    const keyPoints = document.getElementById("ai_key_points").value.trim();
+    if (!keyPoints) {
+        errorBox.innerText = "Please type at least 2-3 points about the campaign first.";
+        errorBox.style.display = "block";
+        return;
+    }
+
+    let token = localStorage.getItem("token");
+    if (!token) {
+        alert("Session expired. Please login again.");
+        window.location.href = "/login/";
+        return;
+    }
+
+    aiBtn.disabled = true;
+    spinner.style.display = "inline-block";
+    label.innerText = "Generating...";
+
+    try {
+        const res = await fetch(`${API_BASE}/api/generate-campaign-ai/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                key_points: keyPoints,
+                budget: document.getElementById("budget").value.trim()
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById("title").value = data.title || "";
+            document.getElementById("description").value = data.description || "";
+            document.getElementById("aiBadge").style.display = "flex";
+        } else {
+            errorBox.innerText = data.error || "AI generation failed. Please try again.";
+            errorBox.style.display = "block";
+        }
+    } catch (err) {
+        errorBox.innerText = "Could not reach the server. Please try again.";
+        errorBox.style.display = "block";
+    } finally {
+        aiBtn.disabled = false;
+        spinner.style.display = "none";
+        label.innerText = "✨ Generate with AI";
+    }
+}
+
 async function createCampaign() {
     const btn = document.getElementById("submitBtn");
     const titleVal = document.getElementById("title").value.trim();
     const descVal = document.getElementById("description").value.trim();
     const budgetVal = document.getElementById("budget").value.trim();
     const deadlineVal = document.getElementById("deadline").value;
-    
+
     let token = localStorage.getItem("token");
 
     if (!token) {
@@ -199,7 +348,7 @@ async function createCampaign() {
     btn.innerText = "Publishing...";
 
     try {
-        const res = await fetch("https://easemycollab.onrender.com/api/create-campaign/", {
+        const res = await fetch(`${API_BASE}/api/create-campaign/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

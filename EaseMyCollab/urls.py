@@ -23,6 +23,7 @@ from campaigns.views import (
     InfluencerApplicationsView,
     UpdateApplicationStatusView,
     PostReviewView,
+    GenerateCampaignAIView, 
 )
 from collaborations.views import AcceptApplicationView
 
@@ -53,6 +54,8 @@ urlpatterns = [
     # --- Campaigns API ---
     path('api/campaigns/', CampaignListView.as_view()),
     path('api/create-campaign/', CreateCampaignView.as_view()),
+    path('api/create-campaign/', CreateCampaignView.as_view()),
+    path('api/generate-campaign-ai/', GenerateCampaignAIView.as_view(), name='generate_campaign_ai'),   # <-- add
     path('api/my-campaigns/', MyCampaignsAPI.as_view()),
     path('api/delete-campaign/<int:id>/', DeleteCampaignAPI.as_view()),
     

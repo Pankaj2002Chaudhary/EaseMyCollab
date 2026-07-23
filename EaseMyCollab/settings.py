@@ -96,6 +96,8 @@ CACHES = {
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
 
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+
 # 10. STATIC & MEDIA FILES CONFIG (Fixes 'Empty static prefix' Crash)
 STATIC_URL = 'static/'  # Standard modern relative path prefix
 STATIC_ROOT = BASE_DIR / 'staticfiles'
