@@ -84,12 +84,28 @@ SIMPLE_JWT = {
 }
 
 # 8. CACHING CONFIGURATION (OTP Storage)
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#         'LOCATION': 'unique-snowflake-easemycollab',
-#     }
-# }
+# 8. CACHING CONFIGURATION (OTP Storage — Redis, shared across all Gunicorn workers)
+REDIS_URL = os.getenv('REDIS_URL')
+
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
+else:
+    # Local dev fallback — agar REDIS_URL set nahi hai (jaise local machine pe),
+    # LocMemCache use ho jayega taaki bina Redis install kiye bhi kaam chal sake.
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake-easemycollab',
+        }
+    }
 
 # 9. EMAIL SETTINGS (SendGrid Official Web API Backend)
 # EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'  # Not used anymore
