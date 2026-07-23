@@ -84,12 +84,12 @@ SIMPLE_JWT = {
 }
 
 # 8. CACHING CONFIGURATION (OTP Storage)
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake-easemycollab',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#         'LOCATION': 'unique-snowflake-easemycollab',
+#     }
+# }
 
 # 9. EMAIL SETTINGS (SendGrid Official Web API Backend)
 # EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'  # Not used anymore
