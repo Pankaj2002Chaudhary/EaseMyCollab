@@ -40,7 +40,9 @@ SYSTEM_PROMPT = (
     "3-6 suggested campaign hashtags starting with #, and posting guidelines "
     "(tone, mandatory #ad/paid-partnership disclosure, posting window). "
     "Do not invent specifics the brand didn't imply (like exact follower counts) "
-    "unless it's a reasonable, clearly-labeled suggestion."
+    "unless it's a reasonable, clearly-labeled suggestion. "
+    "IMPORTANT: Keep the entire description under 220 words total so the JSON "
+    "response stays complete and well-formed — do not let it run on."
 )
 
 
@@ -77,7 +79,7 @@ def generate_campaign_content(key_points, brand_name="", category="", platform="
             {"role": "user", "content": _build_user_prompt(key_points, brand_name, category, platform, budget)},
         ],
         "temperature": 0.7,
-        "max_tokens": 900,
+        "max_tokens": 1600,
         "response_format": {"type": "json_object"},
     }
     headers = {
