@@ -6,7 +6,7 @@ from .serializers import CampaignSerializer
 from brands.models import BrandProfile
 from rest_framework import status
 from .serializers import CampaignSerializer, CampaignAIGenerateSerializer   # CampaignAIGenerateSerializer add karo
-from .services import generate_campaign_content, CampaignAIGenerationError   # yeh naya line
+from .services import generate_campaign_content, CampaignAIGenerationError  
 class CreateCampaignView(APIView):
 
     permission_classes = [IsAuthenticated]

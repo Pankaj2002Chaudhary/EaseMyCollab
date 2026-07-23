@@ -225,7 +225,7 @@
       const res = await fetch("https://easemycollab.onrender.com/api/campaigns/");
       const data = await res.json();
       
-      document.getElementById("totalCampaigns").innerText = data.length;
+      // document.getElementById("totalCampaigns").innerText = data.length;
       list.innerHTML = "";
 
       data.forEach(c => {
