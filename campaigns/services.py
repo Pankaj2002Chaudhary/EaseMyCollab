@@ -1,12 +1,13 @@
 """
 campaigns/services.py
 
-Talks to Groq's OpenAI-compatible Chat Completions API to auto-generate a
-professional campaign brief (title, description, requirements, deliverables,
-hashtags, posting guidelines) from a few basic inputs the brand provides.
+Talks to Groq's OpenAI-compatible Chat Completions API to expand a brand's
+rough 3-4 bullet points into a polished, detailed campaign title + description.
+No new DB columns needed — output maps directly onto Campaign.title /
+Campaign.description.
 
-Kept out of views.py on purpose: views should stay thin (HTTP + permissions),
-this file owns the "business logic" of talking to the external AI API.
+Kept out of views.py on purpose: views stay thin (HTTP + permissions), this
+file owns the "business logic" of talking to the external AI API.
 """
 import os
 import json
@@ -25,45 +26,43 @@ class CampaignAIGenerationError(Exception):
 SYSTEM_PROMPT = (
     "You are a senior influencer-marketing strategist who writes campaign briefs "
     "for a brand-influencer collaboration platform called EaseMyCollab. "
-    "Given a short campaign brief from a brand, generate a complete, professional "
-    "campaign brief. "
+    "The brand will give you a handful of rough bullet points — sometimes just "
+    "3-4 short phrases. Expand them into one complete, professional campaign brief.\n\n"
     "Respond with ONLY a valid JSON object — no markdown fences, no commentary, "
-    "no text outside the JSON — with EXACTLY these keys:\n"
+    "no text outside the JSON — with EXACTLY these two keys:\n"
     '  "title": string — a punchy campaign title, under 12 words.\n'
-    '  "description": string — 3-5 sentence detailed campaign description covering '
-    "what the brand wants and why.\n"
-    '  "influencer_requirements": string — bullet-style text (use "- " per line) '
-    "describing minimum follower count, niche fit, audience demographics and "
-    "engagement rate expectations.\n"
-    '  "deliverables": string — bullet-style text (use "- " per line) listing the '
-    "exact content deliverables, e.g. number of reels/posts/stories and timeline.\n"
-    '  "hashtags": array of 6 to 10 strings, each starting with "#", no spaces, '
-    "relevant to the brand/category/platform.\n"
-    '  "posting_guidelines": string — bullet-style text (use "- " per line) on tone, '
-    "mandatory disclosure (#ad / paid partnership tag), posting window, and brand "
-    "tagging rules."
+    '  "description": string — a detailed, well-organized campaign description, '
+    "3-6 short paragraphs or bullet sections, written in plain text (you may use "
+    "\"- \" for bullet lines). It MUST naturally cover, where relevant to the "
+    "given points: what the campaign is about and its objective, the kind of "
+    "influencers being sought (niche, audience, approximate follower range), "
+    "the expected content deliverables (e.g. number of reels/posts/stories), "
+    "3-6 suggested campaign hashtags starting with #, and posting guidelines "
+    "(tone, mandatory #ad/paid-partnership disclosure, posting window). "
+    "Do not invent specifics the brand didn't imply (like exact follower counts) "
+    "unless it's a reasonable, clearly-labeled suggestion."
 )
 
 
-def _build_user_prompt(brand_name, category, target_influencers, budget, objectives, platform):
-    return (
-        f"Brand name: {brand_name}\n"
-        f"Campaign category: {category}\n"
-        f"Target influencers: {target_influencers}\n"
-        f"Budget: {budget}\n"
-        f"Campaign objectives: {objectives}\n"
-        f"Primary platform: {platform}\n"
-    )
+def _build_user_prompt(key_points, brand_name, category, platform, budget):
+    lines = [f"Brand's rough campaign points:\n{key_points.strip()}"]
+    if brand_name:
+        lines.append(f"Brand name: {brand_name}")
+    if category:
+        lines.append(f"Category: {category}")
+    if platform:
+        lines.append(f"Primary platform: {platform}")
+    if budget:
+        lines.append(f"Budget: {budget}")
+    return "\n".join(lines)
 
 
-def generate_campaign_content(brand_name, category, target_influencers, budget, objectives, platform):
+def generate_campaign_content(key_points, brand_name="", category="", platform="", budget=""):
     """
-    Returns a dict:
-    {
-        "title": str, "description": str, "influencer_requirements": str,
-        "deliverables": str, "hashtags": list[str], "posting_guidelines": str,
-    }
-    Raises CampaignAIGenerationError on any failure.
+    Returns: {"title": str, "description": str}
+    Raises CampaignAIGenerationError on any failure (missing key, network error,
+    bad status code, unparsable response) so the view can return a clean HTTP
+    error instead of a 500 stack trace.
     """
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
@@ -75,12 +74,10 @@ def generate_campaign_content(brand_name, category, target_influencers, budget, 
         "model": GROQ_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": _build_user_prompt(
-                brand_name, category, target_influencers, budget, objectives, platform
-            )},
+            {"role": "user", "content": _build_user_prompt(key_points, brand_name, category, platform, budget)},
         ],
         "temperature": 0.7,
-        "max_tokens": 1024,
+        "max_tokens": 900,
         "response_format": {"type": "json_object"},
     }
     headers = {
@@ -104,16 +101,7 @@ def generate_campaign_content(brand_name, category, target_influencers, budget, 
     except (KeyError, IndexError, json.JSONDecodeError, ValueError) as e:
         raise CampaignAIGenerationError(f"Could not parse the AI response: {e}")
 
-    hashtags = parsed.get("hashtags", [])
-    if isinstance(hashtags, str):
-        hashtags = [h.strip() for h in hashtags.replace(",", " ").split() if h.strip()]
-    hashtags = [h if h.startswith("#") else f"#{h}" for h in hashtags]
-
     return {
         "title": str(parsed.get("title", "")).strip(),
         "description": str(parsed.get("description", "")).strip(),
-        "influencer_requirements": str(parsed.get("influencer_requirements", "")).strip(),
-        "deliverables": str(parsed.get("deliverables", "")).strip(),
-        "hashtags": hashtags,
-        "posting_guidelines": str(parsed.get("posting_guidelines", "")).strip(),
     }
