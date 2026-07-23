@@ -1,34 +1,26 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Campaign
-from .serializers import CampaignSerializer
-from brands.models import BrandProfile
 from rest_framework import status
-from .serializers import CampaignSerializer, CampaignAIGenerateSerializer   # CampaignAIGenerateSerializer add karo
-from .services import generate_campaign_content, CampaignAIGenerationError  
-class CreateCampaignView(APIView):
+from .models import Campaign
+from .serializers import CampaignSerializer, CampaignAIGenerateSerializer
+from .services import generate_campaign_content, CampaignAIGenerationError
+from brands.models import BrandProfile
 
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = CampaignSerializer(data=request.data)
-        
-        if request.user.role != 'brand':
-            return Response({"error": "Only brands can create campaigns"})
-        
-        if serializer.is_valid():
-            brand=BrandProfile.objects.get(user=request.user)
-            serializer.save(brand=brand)
-            return Response({"message": "Campaign created successfully"})
-
-        return Response(serializer.errors)
-
+# ─────────────────────────────────────────────
+# AI CAMPAIGN DESCRIPTION GENERATOR (Groq)
+# ─────────────────────────────────────────────
 class GenerateCampaignAIView(APIView):
     """
     POST /api/generate-campaign-ai/
     Body: { key_points, brand_name?, category?, platform?, budget? }
-    Brand-only. Sirf title+description generate karta hai, campaign create nahi karta.
+    (key_points = 3-4 rough bullet points from the brand, other fields optional)
+
+    Only brands can call this. Does NOT create a Campaign — it only returns
+    an AI-drafted title + detailed description for the frontend to show in
+    editable fields. The brand still has to review/edit and hit
+    "Create Campaign" (CreateCampaignView) to actually publish it.
     """
     permission_classes = [IsAuthenticated]
 
@@ -46,16 +38,47 @@ class GenerateCampaignAIView(APIView):
         try:
             content = generate_campaign_content(**serializer.validated_data)
         except CampaignAIGenerationError as e:
+            # 502 Bad Gateway = "we're fine, the upstream service we depend on failed"
             return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
         return Response(content, status=status.HTTP_200_OK)
+
+
+class CreateCampaignView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CampaignSerializer(data=request.data)
+        
+        if request.user.role != 'brand':
+            return Response({"error": "Only brands can create campaigns"})
+        
+        if serializer.is_valid():
+            brand=BrandProfile.objects.get(user=request.user)
+            serializer.save(brand=brand)
+            return Response({"message": "Campaign created successfully"})
+
+        return Response(serializer.errors)
     
+from rest_framework.pagination import PageNumberPagination
+
+
+class CampaignPagination(PageNumberPagination):
+    page_size = 6                       # kitne campaigns ek page pe
+    page_size_query_param = 'page_size'  # client chahe toh ?page_size=12 bhej sakta hai
+    max_page_size = 50                   # safety cap
+
+
 class CampaignListView(APIView):
 
     def get(self, request):
-        campaigns = Campaign.objects.all()
-        serializer = CampaignSerializer(campaigns, many=True)
-        return Response(serializer.data)
+        # -created_at = sabse naye campaign sabse upar
+        campaigns = Campaign.objects.all().order_by('-created_at')
+        paginator = CampaignPagination()
+        result_page = paginator.paginate_queryset(campaigns, request)
+        serializer = CampaignSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
 from .models import Application
 

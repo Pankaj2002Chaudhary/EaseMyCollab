@@ -171,6 +171,31 @@
 
   .btn-apply:disabled { background: #e0e0e0; color: #a0a0a0; cursor: not-allowed; }
 
+  /* ── PAGINATION ── */
+  .pagination-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .page-btn {
+    padding: 10px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .page-btn:hover:not(:disabled) { background: #f5f2ee; }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .page-info { font-size: 13px; color: var(--text-muted); }
+
   /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -197,12 +222,12 @@
   </div>
 </div>
 
-<!-- <div class="stats-strip">
+<div class="stats-strip">
   <div class="stat-item"><span class="stat-num" id="totalCampaigns">—</span><span class="stat-label">Active Gigs</span></div>
   <div class="stat-item"><span class="stat-num">1.2k+</span><span class="stat-label">Creators</span></div>
   <div class="stat-item"><span class="stat-num">500+</span><span class="stat-label">Brands</span></div>
   <div class="stat-item"><span class="stat-num">₹5M+</span><span class="stat-label">Paid Out</span></div>
-</div> -->
+</div>
 
 <section class="campaign-section" id="campaigns">
   <div class="section-header">
@@ -212,23 +237,44 @@
   <div class="campaign-grid" id="campaign-list">
     <p style="color: var(--text-muted)">Scanning for new opportunities...</p>
   </div>
+
+  <div class="pagination-bar" id="pagination-bar" style="display:none;">
+    <button class="page-btn" id="prevBtn" onclick="goToPage(currentPage - 1)">← Previous</button>
+    <span class="page-info" id="pageInfo"></span>
+    <button class="page-btn" id="nextBtn" onclick="goToPage(currentPage + 1)">Next →</button>
+  </div>
 </section>
 
 <div id="toast" class="toast"></div>
 
 <script>
   const token = localStorage.getItem("token");
+  const API_BASE = "https://easemycollab.onrender.com";
+  const PAGE_SIZE = 6;
+  let currentPage = 1;
 
-  async function loadCampaigns() {
+  async function loadCampaigns(page = 1) {
     const list = document.getElementById("campaign-list");
+    const bar = document.getElementById("pagination-bar");
+    currentPage = page;
+
     try {
-      const res = await fetch("https://easemycollab.onrender.com/api/campaigns/");
+      const res = await fetch(`${API_BASE}/api/campaigns/?page=${page}&page_size=${PAGE_SIZE}`);
       const data = await res.json();
-      
-      // document.getElementById("totalCampaigns").innerText = data.length;
+
+      const totalEl = document.getElementById("totalCampaigns");
+      if (totalEl) totalEl.innerText = data.count ?? 0;
       list.innerHTML = "";
 
-      data.forEach(c => {
+      const results = data.results || [];
+      if (results.length === 0) {
+        list.innerHTML = "<p style='color: var(--text-muted)'>No campaigns yet — check back soon.</p>";
+        bar.style.display = "none";
+        return;
+      }
+
+      // API already returns newest-first (ordered by -created_at on the backend)
+      results.forEach(c => {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
@@ -242,9 +288,24 @@
         `;
         list.appendChild(card);
       });
+
+      // Pagination controls
+      const totalPages = Math.max(1, Math.ceil(data.count / PAGE_SIZE));
+      document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById("prevBtn").disabled = !data.previous;
+      document.getElementById("nextBtn").disabled = !data.next;
+      bar.style.display = totalPages > 1 ? "flex" : "none";
+
     } catch (e) {
       list.innerHTML = "<p>Unable to load campaigns. Please refresh.</p>";
+      bar.style.display = "none";
     }
+  }
+
+  function goToPage(page) {
+    if (page < 1) return;
+    loadCampaigns(page);
+    document.getElementById("campaigns").scrollIntoView({ behavior: "smooth" });
   }
 
   async function applyToCampaign(id) {
@@ -259,21 +320,31 @@
     btn.innerText = "Applying...";
 
     try {
-      const res = await fetch(`https://easemycollab.onrender.com/api/apply/${id}/`, {
+      const res = await fetch(`${API_BASE}/api/apply/${id}/`, {
         method: "POST",
         headers: { "Authorization": "Bearer " + token }
       });
 
+      // Try to read the JSON body regardless of status — the backend sends
+      // a specific {"error": "..."} message we want to show, not a generic one.
+      let data = {};
+      try { data = await res.json(); } catch (_) { /* no JSON body */ }
+
       if (res.ok) {
         btn.innerText = "✓ Applied";
         showToast("Application sent successfully");
+      } else if (data.error && data.error.toLowerCase().includes("already applied")) {
+        btn.disabled = true;
+        btn.innerText = "✓ Already Applied";
+        showToast("You've already applied to this campaign");
       } else {
         btn.disabled = false;
         btn.innerText = "Express Interest";
-        showToast("Failed to apply");
+        showToast(data.error || "Failed to apply. Please try again.");
       }
     } catch (err) {
       btn.disabled = false;
+      btn.innerText = "Express Interest";
       showToast("Network Error");
     }
   }
@@ -285,6 +356,6 @@
     setTimeout(() => t.style.display = "none", 3000);
   }
 
-  loadCampaigns();
+  loadCampaigns(1);
 </script>
 {% endblock %}
