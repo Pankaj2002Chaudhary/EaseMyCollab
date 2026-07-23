@@ -93,7 +93,8 @@ CACHES = {
 
 # 9. EMAIL SETTINGS (SendGrid Official Web API Backend)
 # EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'  # Not used anymore
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+BREVO_API_KEY = os.getenv('BREVO_API_KEY')
 DEFAULT_FROM_EMAIL = 'pankajchoudhary6643@gmail.com'
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')

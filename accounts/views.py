@@ -1,7 +1,6 @@
 import os
 import random
-import sendgrid
-from sendgrid.helpers.mail import Mail
+import requests
 
 from django.conf import settings
 from django.core.cache import cache
@@ -25,18 +24,31 @@ User = get_user_model()
 
 
 # ─────────────────────────────────────────────
-# HELPER: Send email via SendGrid HTTP API
-# (No SMTP — works on Render free tier)
+# HELPER: Send email via Brevo HTTP API
+# (No SMTP — works on Render free tier. SendGrid's free
+# plan expired, switched to Brevo: 300 emails/day free, forever)
 # ─────────────────────────────────────────────
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+
+
 def send_otp_email(to_email, subject, body):
-    sg = sendgrid.SendGridAPIClient(api_key=os.getenv('SENDGRID_API_KEY'))
-    message = Mail(
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to_emails=to_email,
-        subject=subject,
-        plain_text_content=body
-    )
-    response = sg.client.mail.send.post(request_body=message.get())
+    api_key = os.getenv('BREVO_API_KEY')
+    headers = {
+        "api-key": api_key,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    payload = {
+        "sender": {"email": settings.DEFAULT_FROM_EMAIL},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "textContent": body,
+    }
+    response = requests.post(BREVO_API_URL, headers=headers, json=payload, timeout=15)
+    if response.status_code >= 400:
+        # Same behavior as before: raise so the calling view's try/except
+        # logs "CRITICAL EMAIL ERROR" with the real reason.
+        raise Exception(f"Brevo API error {response.status_code}: {response.text[:300]}")
     return response.status_code
 
 
